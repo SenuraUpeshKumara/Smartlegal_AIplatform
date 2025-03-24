@@ -30,7 +30,14 @@ const Register = () => {
     e.preventDefault();
     console.log("User Registered:", formData);
     alert("Registration Successful!");
-    navigate("/adminhome"); // Redirect to Admin Home after registration
+
+    if (formData.role === "client") {
+      navigate("/clienthome"); // Redirect to Client Home
+    } else if (formData.role === "lawyer") {
+      navigate("/lawyer"); // Redirect to Lawyer Dashboard
+    } else {
+      navigate("/adminhome"); // Redirect to Admin Home
+    }
   };
 
   return (

@@ -1,8 +1,8 @@
 import React from "react";
 import { Button, Container, Grid, Typography, Paper } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import Navbar from "./Navbar";
-import Footer from "./Footer";
+import Navbar from "../component/Navbar";
+import Footer from "../component/Footer";
 
 const Adminhome = () => {
   const navigate = useNavigate();
@@ -15,6 +15,7 @@ const Adminhome = () => {
           <Typography variant="h4" gutterBottom>
             Admin Dashboard
           </Typography>
+          
           <Grid container spacing={2} justifyContent="center">
             <Grid item xs={12} sm={6}>
               <Button
