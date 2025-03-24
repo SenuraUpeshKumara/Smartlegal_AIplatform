@@ -1,5 +1,5 @@
 import React from "react";
-import "./Lawyer.css";
+import "../component/styles/Lawyer.css";
 
 const Lawyer = () => {
   return (
