@@ -4,8 +4,9 @@ import mongoose from "mongoose";
 import cors from "cors";
 import "dotenv/config";
 import cookieParser from "cookie-parser";
+//import { UserRouter } from "./routes/.js";
 import { UserRouter } from "./routes/userRouter.js";
-
+import clientRouter from "./routes/clientRouter.js";
 
 const app = express();
 
@@ -30,6 +31,7 @@ mongoose
 
 // Use the UserRouter for routes starting with /user
 app.use("/user", UserRouter);
+app.use("/clientmanagement",clientRouter)
 
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
@@ -38,6 +40,11 @@ app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 app.use("/", (req, res) => {
   res.send("successful");
+});
+
+// Keep this at the END of all routes
+app.get("/", (req, res) => {
+  res.send("API is running...");
 });
 
 // Export the app as a serverless function
