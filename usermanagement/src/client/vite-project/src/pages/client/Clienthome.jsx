@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Drawer, List, ListItem, ListItemButton, ListItemText, Box, Typography } from "@mui/material";
-import "./clienthome.css";
+import "../component/styles/clienthome.css";
 
 const drawerWidth = 240;
 
@@ -30,7 +30,7 @@ const Clienthome = () => {
         <List>
           {[
             { text: "Add Client", route: "/addclient" },
-            { text: "client profile", route: "/addclient" },
+            { text: "client profile", route: "" },
             { text: "View Appointments", route: "/appointments" },
             { text: "Case Initiation", route: "/case-initiation" }
           ].map((item) => (

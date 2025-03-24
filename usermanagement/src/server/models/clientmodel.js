@@ -1,42 +1,68 @@
 import mongoose from "mongoose";
 
-const UserSchema = new mongoose.Schema({
-  clientname: {
+const ClientSchema = new mongoose.Schema({
+  name: {
     type: String,
     required: true,
   },
 
-  clientage: {
+  number: {
     type: String,
     required: true,
-    unique: true,
-  
   },
 
-  email: {
+  address: {
     type: String,
     required: true,
-    unique: true,
-    trim: true,
-    match: [/.+\@.+\..+/, "Invalid email format"],
   },
 
-
-  pname: {
+  occupation: {
     type: String,
     required: true,
-    minlength: 6,
   },
 
-  evidences: {
+  NIC: {
     type: String,
-    required:true,
+    required: true,
+    unique: true, // Ensures NIC is unique
   },
 
+  casetype: {
+    type: String,
+    required: true,
+  },
 
- 
+  casetitle: {
+    type: String,
+    required: true,
+  },
+
+  description: {
+    type: String,
+    required: true,
+  },
+
+  opposername: {
+    type: String,
+    required: true,
+  },
+
+  opp_number: {
+    type: String,
+    required: true,
+  },
+
+  agreements: {
+    type: [String], // Stores file paths or URLs for uploaded agreements
+    required: false,
+  },
+
+  other_documents: {
+    type: [String], // Stores file paths or URLs for uploaded documents
+    required: false,
+  },
 });
 
-const UserModel = mongoose.model("User", UserSchema);
+const Client = mongoose.model("Client", ClientSchema);
 
-export { UserModel as User };
+export { Client };
