@@ -37,7 +37,7 @@ app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 
 app.use("/", (req, res) => {
-  res.send("Hello");
+  res.send("successful");
 });
 
 // Export the app as a serverless function
