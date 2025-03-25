@@ -1,15 +1,37 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Drawer, List, ListItem, ListItemButton, ListItemText, Box, Typography } from "@mui/material";
+import {
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  Box,
+  Typography,
+  Menu,
+  MenuItem,
+  Avatar,
+  IconButton,
+} from "@mui/material";
+import { AccountCircle } from "@mui/icons-material";
 import "../component/styles/clienthome.css";
 
 const drawerWidth = 240;
 
-const Clienthome = () => {
+const Clienthome = ({ clientId }) => {
   const navigate = useNavigate();
+  const [anchorEl, setAnchorEl] = useState(null);
 
   const handleNavigation = (route) => {
     navigate(route);
+  };
+
+  const handleProfileMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleProfileMenuClose = () => {
+    setAnchorEl(null);
   };
 
   return (
@@ -24,13 +46,29 @@ const Clienthome = () => {
           [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: "border-box", backgroundColor: "#2c3e50", padding: "10px", color: "white" },
         }}
       >
+        {/* Profile Section */}
+        <Box className="clienthome-profile" sx={{ display: "flex", justifyContent: "center", alignItems: "center", my: 2 }}>
+          <IconButton onClick={handleProfileMenuOpen} sx={{ color: "#ecf0f1" }}>
+            <Avatar sx={{ bgcolor: "#1abc9c" }}>
+              <AccountCircle />
+            </Avatar>
+          </IconButton>
+          <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleProfileMenuClose}>
+            <MenuItem onClick={() => handleNavigation("/edit-profile")}>Edit Profile</MenuItem>
+            {/* Fix: Pass clientId dynamically */}
+            <MenuItem onClick={() => handleNavigation(`/view-profile/${clientId}`)}>View Profile</MenuItem>
+
+            <MenuItem onClick={() => console.log("Delete Account")}>Delete Account</MenuItem>
+          </Menu>
+        </Box>
+        
         <Box className="clienthome-header" sx={{ textAlign: "center", my: 2, fontWeight: "bold" }}>
           <Typography variant="h6" sx={{ color: "#ecf0f1" }}>Client Dashboard</Typography>
         </Box>
         <List>
-          {[
+          {[ 
             { text: "Add Client", route: "/addclient" },
-            { text: "client profile", route: "" },
+            { text: "Client Profile", route: "/clientprofile" },
             { text: "View Appointments", route: "/appointments" },
             { text: "Case Initiation", route: "/case-initiation" }
           ].map((item) => (
@@ -54,5 +92,8 @@ const Clienthome = () => {
     </Box>
   );
 };
+
+
+
 
 export default Clienthome;

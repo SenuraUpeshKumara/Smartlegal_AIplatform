@@ -1,17 +1,19 @@
 import express from "express";
-import dotenv from "dotenv";
+//import dotenv from "dotenv";
 import mongoose from "mongoose";
 import cors from "cors";
 import "dotenv/config";
 import cookieParser from "cookie-parser";
 //import { UserRouter } from "./routes/.js";
 import { UserRouter } from "./routes/userRouter.js";
-import clientRouter from "./routes/clientRouter.js";
+import {clientRouter} from "./routes/clientRouter.js";
 
 const app = express();
 
 // Middleware to parse JSON
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 app.use(cookieParser());
 
 // CORS configuration for frontend to access the server
