@@ -14,11 +14,12 @@ import { useNavigate } from "react-router-dom";
 const Register = () => {
   const [formData, setFormData] = useState({
     name: "",
-    contactNumber: "",
+    contactNo: "",
     email: "",
     password: "",
     role: "client",
   });
+
 
   const navigate = useNavigate();
 
@@ -26,19 +27,34 @@ const Register = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("User Registered:", formData);
-    alert("Registration Successful!");
 
-    if (formData.role === "client") {
-      navigate("/clienthome"); // Redirect to Client Home
-    } else if (formData.role === "lawyer") {
-      navigate("/lawyer"); // Redirect to Lawyer Dashboard
-    } else {
-      navigate("/adminhome"); // Redirect to Admin Home
+    try {
+      const response = await fetch("http://localhost:8000/user/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+      console.log("Server Response:", data);
+
+      if (response.ok) {
+        alert("Registration Successful!");
+        navigate(formData.role === "client" ? "/clienthome" : formData.role === "lawyer" ? "/lawyer" : "/adminhome");
+      } else {
+        alert(`Error: ${data.message || "Registration failed!"}`);
+      }
+    } catch (error) {
+      console.error("Error registering user:", error);
+      alert("An error occurred. Please try again.");
     }
   };
+
+
 
   return (
     <Container maxWidth="sm">
@@ -58,9 +74,9 @@ const Register = () => {
           />
           <TextField
             fullWidth
-            label="Contact Number"
-            name="contactNumber"
-            value={formData.contactNumber}
+            label="ContactNo"
+            name="contactNo"
+            value={formData.contactNo}
             onChange={handleChange}
             margin="normal"
             required

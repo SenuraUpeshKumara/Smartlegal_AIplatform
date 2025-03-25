@@ -10,7 +10,7 @@ const App = () => {
     <div>
       <ToastContainer />
       <Routes>
-        <Route path='/client/register-legal-case' element={<RegisterLegalCase />} />
+        <Route path='/' element={<RegisterLegalCase />} />
       </Routes>
     </div>
   );
