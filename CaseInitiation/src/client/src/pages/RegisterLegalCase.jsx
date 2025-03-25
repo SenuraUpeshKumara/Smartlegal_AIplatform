@@ -23,12 +23,8 @@ const RegisterLegalCase = () => {
         caseDescription: "",
         plaintiff: {
             plaintiffName: "",
-            plaintiffAddress: [
-                {
-                    homeAddress: "",
-                    businessAddress: "",
-                },
-            ],
+            plaintiffHomeAddress: "",
+            plaintiffBusinessAddress: "",
             plaintiffContactNo: "",
             plaintiffEmail: "",
             plaintiffDOB: "",
@@ -38,12 +34,8 @@ const RegisterLegalCase = () => {
         },
         defendant: {
             defendantName: "",
-            defendantAddress: [
-                {
-                    homeAddress: "",
-                    businessAddress: "",
-                },
-            ],
+            defendantHomeAddress: "",
+            defendantBusinessAddress: "",
             defendantContactNo: "",
             defendantEmail: "",
             defendantDOB: "",
@@ -100,31 +92,48 @@ const RegisterLegalCase = () => {
                     },
                 }));
             }
-        } else if (name.startsWith("lawyer.contactInfo.")) {
+        }
+        // Handle lawyer fields
+        else if (name.startsWith("lawyer.")) {
             const [section, subSection, field] = name.split(".");
-            setFormData((prevData) => ({
-                ...prevData,
-                lawyer: {
-                    ...prevData.lawyer,
-                    contactInfo: {
-                        ...prevData.lawyer.contactInfo,
-                        [field]: value,
+
+            if (subSection === "contactInfo") {
+                // Handle lawyer.contactInfo fields (e.g., lawyer.contactInfo.officeAddress)
+                setFormData((prevData) => ({
+                    ...prevData,
+                    lawyer: {
+                        ...prevData.lawyer,
+                        contactInfo: {
+                            ...prevData.lawyer.contactInfo,
+                            [field]: value,
+                        },
                     },
-                },
-            }));
-        } else if (name.startsWith("lawyer.barRegistration.")) {
-            const [section, subSection, field] = name.split(".");
-            setFormData((prevData) => ({
-                ...prevData,
-                lawyer: {
-                    ...prevData.lawyer,
-                    barRegistration: {
-                        ...prevData.lawyer.barRegistration,
-                        [field]: value,
+                }));
+            } else if (subSection === "barRegistration") {
+                // Handle lawyer.barRegistration fields (e.g., lawyer.barRegistration.barAssociationID)
+                setFormData((prevData) => ({
+                    ...prevData,
+                    lawyer: {
+                        ...prevData.lawyer,
+                        barRegistration: {
+                            ...prevData.lawyer.barRegistration,
+                            [field]: value,
+                        },
                     },
-                },
-            }));
-        } else {
+                }));
+            } else {
+                // Handle other lawyer fields (e.g., lawyer.LawyerFullName, lawyer.lawFirmName, lawyer.firmAddress)
+                setFormData((prevData) => ({
+                    ...prevData,
+                    lawyer: {
+                        ...prevData.lawyer,
+                        [subSection]: value,
+                    },
+                }));
+            }
+        }
+        // Handle top-level fields
+        else {
             setFormData((prevData) => ({
                 ...prevData,
                 [name]: value,
@@ -239,8 +248,8 @@ const RegisterLegalCase = () => {
                                 <TextField
                                     fullWidth
                                     label="Home Address"
-                                    name="plaintiff.plaintiffAddress[0].homeAddress"
-                                    value={formData.plaintiff.plaintiffAddress[0].homeAddress}
+                                    name="plaintiff.plaintiffHomeAddress"
+                                    value={formData.plaintiff.plaintiffHomeAddress}
                                     onChange={handleChange}
                                     margin="normal"
                                     required
@@ -250,8 +259,8 @@ const RegisterLegalCase = () => {
                                 <TextField
                                     fullWidth
                                     label="Business Address"
-                                    name="plaintiff.plaintiffAddress[0].businessAddress"
-                                    value={formData.plaintiff.plaintiffAddress[0].businessAddress}
+                                    name="plaintiff.plaintiffBusinessAddress"
+                                    value={formData.plaintiff.plaintiffBusinessAddress}
                                     onChange={handleChange}
                                     margin="normal"
                                     required
@@ -353,8 +362,8 @@ const RegisterLegalCase = () => {
                                 <TextField
                                     fullWidth
                                     label="Home Address"
-                                    name="defendant.defendantAddress[0].homeAddress"
-                                    value={formData.defendant.defendantAddress[0].homeAddress}
+                                    name="defendant.defendantHomeAddress"
+                                    value={formData.defendant.defendantHomeAddress}
                                     onChange={handleChange}
                                     margin="normal"
                                     required
@@ -364,8 +373,8 @@ const RegisterLegalCase = () => {
                                 <TextField
                                     fullWidth
                                     label="Business Address"
-                                    name="defendant.defendantAddress[0].businessAddress"
-                                    value={formData.defendant.defendantAddress[0].businessAddress}
+                                    name="defendant.defendantBusinessAddress"
+                                    value={formData.defendant.defendantBusinessAddress}
                                     onChange={handleChange}
                                     margin="normal"
                                     required

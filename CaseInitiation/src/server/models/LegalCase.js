@@ -24,12 +24,15 @@ const LegalCaseSchema = new mongoose.Schema({
         required: true,
       }, //store plaintiff's id
     
-      plaintiffAddress: [
-        {
-          homeAddress: String,
-          businessAddress: String,
-        },
-      ],
+      plaintiffHomeAddress: {
+        type: String,
+        required: true,
+      },
+
+      plaintiffBusinessAddress: {
+        type: String,
+        required: true,
+      },
     
       plaintiffContactNo: {
         type: String,
@@ -85,12 +88,15 @@ const LegalCaseSchema = new mongoose.Schema({
         required: true,
       }, //store plaintiff's id
     
-      defendantAddress: [
-        {
-          homeAddress: String,
-          businessAddress: String,
-        },
-      ],
+      defendantHomeAddress: {
+        type: String,
+        required: true,
+      },
+
+      defendantBusinessAddress: {
+        type: String,
+        required: true,
+      },
     
       defendantContactNo: {
         type: String,
