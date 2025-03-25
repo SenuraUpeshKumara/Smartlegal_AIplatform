@@ -10,6 +10,7 @@ import Addclient from './pages/client/Addclient';
 import Clientprofile from './pages/client/clientprofile';
 import Editprofile from './pages/client/Editprofile'
 import Viewprofile from "./pages/client/Viewprofile";
+//import Caseinitiation from './pages/client/Caseinitiation'
 const App = () => {
   return (
     <div>
@@ -24,6 +25,8 @@ const App = () => {
         <Route path="/clientprofile" element={<Clientprofile/>}/>
         <Route path="/edit-profile" element={<Editprofile/>}/>
         <Route path="/view-profile/:clientId" element={<Viewprofile />} />
+   
+
 
 
       </Routes>
