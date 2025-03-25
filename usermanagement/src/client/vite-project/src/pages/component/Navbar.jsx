@@ -11,7 +11,7 @@ const Navbar = () => {
         <Typography variant="h6" style={{ flexGrow: 1 }}>
           Admin Panel
         </Typography>
-        <Button color="inherit" onClick={() => navigate("/")}>
+        <Button color="inherit" onClick={() => navigate("/login")}>
           Logout
         </Button>
       </Toolbar>

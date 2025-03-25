@@ -24,7 +24,7 @@ router.post("/signup", async (req, res) => {
     return res
       .status(400)
       .json({
-        message: "Name, Contact Number, Email, Password, and Role are required",
+        message: "Name, ContactNo, Email, Password, and Role are required",
       });
   }
 
