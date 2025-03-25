@@ -47,8 +47,8 @@ router.post("/signup", async (req, res) => {
       email,
       password: hashedPassword,
       role,
-      ...(role === "customer" && { companyID }), // Include companyID for customers
-      ...(role === "engineer" && { categoryName }), // Include categoryName for engineers
+      ...(role === "customer" && { companyID }), // Include companyID for customers //customer // companyID
+      ...(role === "engineer" && { categoryName }), // Include categoryName for engineers // engineer // categoryName
     });
 
     // Save the user
@@ -104,30 +104,46 @@ Use these credentials to access our website. Thank you!`,
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
+  // Hardcoded admin credentials
+  const ADMIN_EMAIL = "admin@example.com";
+  const ADMIN_PASSWORD = "Admin@123"; // Store securely in env variables in production
+
   try {
+    // Check if login credentials match the hardcoded admin credentials
+    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+      const token = jwt.sign({ id: "admin" }, process.env.KEY, {
+        expiresIn: "7d",
+      });
+
+      res.cookie("token", token, { httpOnly: true, secure: true, sameSite: "none" });
+
+      return res.json({
+        success: true,
+        role: "admin",
+        message: "Admin login successful",
+      });
+    }
+
+    // Check database for other users
     const user = await User.findOne({ email });
     if (!user) {
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
+      return res.status(404).json({ success: false, message: "User not found" });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid credentials" });
+      return res.status(400).json({ success: false, message: "Invalid credentials" });
     }
 
     const token = jwt.sign({ id: user._id }, process.env.KEY, {
       expiresIn: "7d",
     });
+
     res.cookie("token", token, { httpOnly: true, secure: true, sameSite: "none" });
-    //corrected
 
     res.json({
       success: true,
-      role: user.role, // Include the role in the response
+      role: user.role,
       message: "Login successful",
     });
   } catch (error) {
