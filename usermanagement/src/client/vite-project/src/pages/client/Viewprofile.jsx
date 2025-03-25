@@ -1,11 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Box, Typography, Paper, CircularProgress, Alert } from "@mui/material";
+import { useLocation } from 'react-router-dom';
 
-const Viewprofile = () => {
-  const { clientId } = useParams(); // Get the client ID from URL parameters
-  console.log("Client ID from URL:", clientId); // Debugging clientId
+const ViewProfile = () => {
+  //const { id } = useParams(); // Get the client ID from URL parameters
+  //console.log("Client ID from URL:", id); // Debugging clientId
 
+  const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const clientId = queryParams.get('clientId');
+    console.log('Client ID from URL:', clientId);
+    
   const [client, setClient] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -26,7 +32,7 @@ const Viewprofile = () => {
       })
       .then((data) => {
         console.log("API Response:", data);
-        setClient(data); // Store client data
+        setClient(data.data); // Store client data
         setLoading(false);
       })
       .catch((error) => {
@@ -90,4 +96,4 @@ const Viewprofile = () => {
   );
 };
 
-export default Viewprofile;
+export default ViewProfile;
