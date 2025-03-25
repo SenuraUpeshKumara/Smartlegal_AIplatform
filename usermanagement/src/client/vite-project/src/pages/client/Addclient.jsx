@@ -42,30 +42,43 @@ const AddClient = () => {
     setFormData({ ...formData, [name]: [...files] });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Client Data:", formData);
-
-    // Simulating API Call
-    setTimeout(() => {
-      setOpenSuccessDialog(true);
-      setFormData({
-        name: "",
-        number: "",
-        address: "",
-        occupation: "",
-        NIC: "",
-        casetype: "",
-        casetitle: "",
-        description: "",
-        opposername: "",
-        opp_number: "",
-        agreements: [],
-        other_documents: [],
+  
+    try {
+      const response = await fetch("http://localhost:8000/clientmanagement/add-client", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
       });
-    }, 500);
+  
+      if (response.ok) {
+        console.log("Client added successfully");
+        setOpenSuccessDialog(true);
+        setFormData({
+          name: "",
+          number: "",
+          address: "",
+          occupation: "",
+          NIC: "",
+          casetype: "",
+          casetitle: "",
+          description: "",
+          opposername: "",
+          opp_number: "",
+          agreements: [],
+          other_documents: [],
+        });
+      } else {
+        console.error("Error adding client:", await response.json());
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    }
   };
-
+  
   const handleClose = () => {
     setOpenSuccessDialog(false);
   };

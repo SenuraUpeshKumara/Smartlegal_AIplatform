@@ -10,7 +10,7 @@ const ViewProfile = () => {
   const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const clientId = queryParams.get('clientId');
-    console.log('Client ID from URL:', clientId);
+    console.log('Client ID from URL:', {clientId});
     
   const [client, setClient] = useState(null);
   const [loading, setLoading] = useState(true);
