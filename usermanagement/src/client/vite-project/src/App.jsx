@@ -3,7 +3,7 @@ import { Routes,Route } from 'react-router-dom'
 import Login from './pages/component/Login'
 import Adminhome from './pages/Admin/Adminhome'
 import Navbar from './pages/component/Navbar'
-import Register from './pages/component/Register'
+import Register from './pages/Admin/Register'
 import Lawyer from './pages/lawyer/lawyer';
 import Clienthome from './pages/client/Clienthome'
 import Addclient from './pages/client/Addclient';

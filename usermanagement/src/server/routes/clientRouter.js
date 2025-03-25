@@ -47,7 +47,9 @@ router.post(
         !opposername ||
         !opp_number
       ) {
-        return res.status(400).json({ success: false, message: "All fields are required." });
+        return res
+          .status(400)
+          .json({ success: false, message: "All fields are required." });
       }
 
       const agreements = req.files["agreements"]
@@ -73,9 +75,21 @@ router.post(
       });
 
       const savedClient = await newClient.save();
-      res.status(201).json({ success: true, message: "Client created successfully.", data: savedClient });
+      res
+        .status(201)
+        .json({
+          success: true,
+          message: "Client created successfully.",
+          data: savedClient,
+        });
     } catch (error) {
-      res.status(500).json({ success: false, message: "Internal server error.", error: error.message });
+      res
+        .status(500)
+        .json({
+          success: false,
+          message: "Internal server error.",
+          error: error.message,
+        });
     }
   }
 );
@@ -85,11 +99,19 @@ router.get("/get-client/:id", async (req, res) => {
   try {
     const client = await Client.findById(req.params.id);
     if (!client) {
-      return res.status(404).json({ success: false, message: "Client not found." });
+      return res
+        .status(404)
+        .json({ success: false, message: "Client not found." });
     }
     res.status(200).json({ success: true, data: client });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Internal server error.", error: error.message });
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Internal server error.",
+        error: error.message,
+      });
   }
 });
 
@@ -102,24 +124,46 @@ router.put(
       const updatedData = { ...req.body };
 
       if (req.files["agreements"]) {
-        updatedData.agreements = req.files["agreements"].map((file) => file.path);
+        updatedData.agreements = req.files["agreements"].map(
+          (file) => file.path
+        );
       }
       if (req.files["other_documents"]) {
-        updatedData.other_documents = req.files["other_documents"].map((file) => file.path);
+        updatedData.other_documents = req.files["other_documents"].map(
+          (file) => file.path
+        );
       }
 
-      const updatedClient = await Client.findByIdAndUpdate(req.params.id, updatedData, {
-        new: true,
-        runValidators: true,
-      });
+      const updatedClient = await Client.findByIdAndUpdate(
+        req.params.id,
+        updatedData,
+        {
+          new: true,
+          runValidators: true,
+        }
+      );
 
       if (!updatedClient) {
-        return res.status(404).json({ success: false, message: "Client not found." });
+        return res
+          .status(404)
+          .json({ success: false, message: "Client not found." });
       }
 
-      res.status(200).json({ success: true, message: "Client updated successfully.", data: updatedClient });
+      res
+        .status(200)
+        .json({
+          success: true,
+          message: "Client updated successfully.",
+          data: updatedClient,
+        });
     } catch (error) {
-      res.status(500).json({ success: false, message: "Internal server error.", error: error.message });
+      res
+        .status(500)
+        .json({
+          success: false,
+          message: "Internal server error.",
+          error: error.message,
+        });
     }
   }
 );
@@ -129,12 +173,22 @@ router.delete("/delete-client/:id", async (req, res) => {
   try {
     const deletedClient = await Client.findByIdAndDelete(req.params.id);
     if (!deletedClient) {
-      return res.status(404).json({ success: false, message: "Client not found." });
+      return res
+        .status(404)
+        .json({ success: false, message: "Client not found." });
     }
 
-    res.status(200).json({ success: true, message: "Client deleted successfully." });
+    res
+      .status(200)
+      .json({ success: true, message: "Client deleted successfully." });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Internal server error.", error: error.message });
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Internal server error.",
+        error: error.message,
+      });
   }
 });
 
