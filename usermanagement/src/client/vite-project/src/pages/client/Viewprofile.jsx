@@ -2,17 +2,19 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { Box, Typography, Paper, CircularProgress, Alert } from "@mui/material";
+import { AppContent } from "./Appcontext";
+
 
 const ViewProfile = () => {
-    const { clientId } = useParams();
+    //const { clientId } = useParams();
     const [userData, setUserData] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+   // const [loading, setLoading] = useState(true);
+   // const [error, setError] = useState("");
 
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const response = await axios.get(`http://localhost:8000/user/${clientId}`, { withCredentials: true });
+                const response = await axios.get(`http://localhost:8000/user/get/${clientId}`, { withCredentials: true });
                 if (response.data.success) {
                     setUserData(response.data.user);
                 } else {
@@ -42,6 +44,7 @@ const ViewProfile = () => {
                 <Typography variant="h5" gutterBottom sx={{ textAlign: "center", fontWeight: "bold" }}>
                     Client Profile
                 </Typography>
+                <Typography variant="subtitle1"><strong>Name:</strong> {userData.id}</Typography>
                 <Typography variant="subtitle1"><strong>Name:</strong> {userData.name}</Typography>
                 <Typography variant="subtitle1"><strong>Contact Number:</strong> {userData.contactNo}</Typography>
                 <Typography variant="subtitle1"><strong>Email:</strong> {userData.email}</Typography>
