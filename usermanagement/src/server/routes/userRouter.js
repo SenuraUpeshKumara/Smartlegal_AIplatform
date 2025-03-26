@@ -230,6 +230,11 @@ router.post("/send-verify-OTP", userAuth, async (req, res) => {
   }
 });
 
+// verifyToken.js (middleware)
+
+
+
+
 //verify email using OTP
 router.post("/verify-account", userAuth, async (req, res) => {
   const { userID, OTP } = req.body;
