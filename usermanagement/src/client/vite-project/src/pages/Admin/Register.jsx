@@ -44,7 +44,7 @@ const Register = () => {
 
       if (response.ok) {
         alert("Registration Successful!");
-        navigate(formData.role === "client" ? "/clienthome" : formData.role === "lawyer" ? "/lawyer" : "/adminhome");
+        navigate(`/adminhome`);
       } else {
         alert(`Error: ${data.message || "Registration failed!"}`);
       }
