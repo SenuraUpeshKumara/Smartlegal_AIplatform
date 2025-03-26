@@ -3,9 +3,10 @@ import { LegalCase } from "../models/LegalCase.js"; // Adjust the import path as
 
 const router = express.Router();
 
-
 router.post("/create-legal-case", async (req, res) => {
   try {
+    console.log("Incoming Request Body:", req.body); // Log the incoming data for debugging
+
     // Extract data from the request body
     const {
       caseTitle,
@@ -17,7 +18,14 @@ router.post("/create-legal-case", async (req, res) => {
     } = req.body;
 
     // Validate required fields (basic validation)
-    if (!caseTitle || !caseType || !caseDescription || !plaintiff || !defendant || !lawyer) {
+    if (
+      !caseTitle ||
+      !caseType ||
+      !caseDescription ||
+      !plaintiff ||
+      !defendant ||
+      !lawyer
+    ) {
       return res.status(400).json({
         success: false,
         message: "All fields are required.",
@@ -62,4 +70,4 @@ router.post("/create-legal-case", async (req, res) => {
   }
 });
 
-export { router as LegalCaseRouter }; 
+export { router as LegalCaseRouter };
