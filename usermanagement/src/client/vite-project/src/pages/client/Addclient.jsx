@@ -16,18 +16,15 @@ import { useNavigate } from "react-router-dom";
 
 const AddClient = () => {
   const [formData, setFormData] = useState({
-    name: "",
-    number: "",
-    address: "",
-    occupation: "",
+    Fullname: "",
+    dob: "",
+    homeaddress: "",
+    businessaddress: "",
     NIC: "",
-    casetype: "",
-    casetitle: "",
     description: "",
-    opposername: "",
-    opp_number: "",
-    agreements: [],
+    agreements:[],
     other_documents: [],
+   
   });
 
   const [openSuccessDialog, setOpenSuccessDialog] = useState(false);
@@ -58,16 +55,13 @@ const AddClient = () => {
         console.log("Client added successfully");
         setOpenSuccessDialog(true);
         setFormData({
-          name: "",
-          number: "",
-          address: "",
-          occupation: "",
+          Fullname: "",
+          dob: "",
+          homeaddress: "",
+          businessaddress: "",
           NIC: "",
-          casetype: "",
-          casetitle: "",
           description: "",
-          opposername: "",
-          opp_number: "",
+         
           agreements: [],
           other_documents: [],
         });
@@ -92,26 +86,16 @@ const AddClient = () => {
 
         <form onSubmit={handleSubmit}>
           {/* Basic Details */}
-          <TextField fullWidth label="Full Name" name="name" value={formData.name} onChange={handleChange} margin="normal" required sx={{ marginBottom: "15px" }} />
-          <TextField fullWidth label="Contact Number" name="number" type="tel" value={formData.number} onChange={handleChange} margin="normal" required sx={{ marginBottom: "15px" }} />
-          <TextField fullWidth label="Address" name="address" value={formData.address} onChange={handleChange} margin="normal" required sx={{ marginBottom: "15px" }} />
-          <TextField fullWidth label="Occupation" name="occupation" value={formData.occupation} onChange={handleChange} margin="normal" required sx={{ marginBottom: "15px" }} />
+          <TextField fullWidth label="Full Name" name="name" value={formData.Fullname} onChange={handleChange} margin="normal" required sx={{ marginBottom: "15px" }} />
+          <TextField fullWidth label=" Date of birth" name="dob" type="Date" value={formData.dob} onChange={handleChange} margin="normal" required sx={{ marginBottom: "15px" }} />
+          <TextField fullWidth label="Home address" name="homeaddress" value={formData.homeaddress} onChange={handleChange} margin="normal" required sx={{ marginBottom: "15px" }} />
+          <TextField fullWidth label="Business address" name="businessaddress" value={formData.businessaddress} onChange={handleChange} margin="normal" required sx={{ marginBottom: "15px" }} />
           <TextField fullWidth label="NIC" name="NIC" value={formData.NIC} onChange={handleChange} margin="normal" required sx={{ marginBottom: "15px" }} />
 
-          {/* Case Details */}
-          <TextField select fullWidth label="Case Type" name="casetype" value={formData.casetype} onChange={handleChange} margin="normal" required sx={{ marginBottom: "15px" }}>
-            <MenuItem value="Civil">Civil</MenuItem>
-            <MenuItem value="Criminal">Criminal</MenuItem>
-            <MenuItem value="Family">Family</MenuItem>
-            <MenuItem value="Property">Property</MenuItem>
-          </TextField>
-          <TextField fullWidth label="Case Title" name="casetitle" value={formData.casetitle} onChange={handleChange} margin="normal" required sx={{ marginBottom: "15px" }} />
+          
           <TextField fullWidth label="Case Description" name="description" value={formData.description} onChange={handleChange} margin="normal" required multiline rows={4} sx={{ marginBottom: "15px" }} />
 
-          {/* Opposer Details */}
-          <TextField fullWidth label="Opposer Name" name="opposername" value={formData.opposername} onChange={handleChange} margin="normal" required sx={{ marginBottom: "15px" }} />
-          <TextField fullWidth label="Opposer Contact Number" name="opp_number" type="tel" value={formData.opp_number} onChange={handleChange} margin="normal" required sx={{ marginBottom: "15px" }} />
-
+         
           {/* File Uploads */}
           <Typography variant="subtitle1" sx={{ marginTop: "15px" }}>
             Upload Agreements:
