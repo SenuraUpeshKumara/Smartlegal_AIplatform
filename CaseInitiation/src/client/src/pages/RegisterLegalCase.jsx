@@ -15,6 +15,8 @@ import {
     StepLabel,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import axios from "axios"; // Import Axios
+import { toast } from "react-toastify";
 
 const RegisterLegalCase = () => {
     const [formData, setFormData] = useState({
@@ -59,46 +61,25 @@ const RegisterLegalCase = () => {
             representStatus: "Plaintiff",
         },
     });
-
     const [activeStep, setActiveStep] = useState(0);
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
+    // Handle input changes for nested fields
     const handleChange = (e) => {
         const { name, value } = e.target;
-
-        // Handle nested fields like plaintiff and defendant
         if (name.startsWith("plaintiff.") || name.startsWith("defendant.")) {
-            const [section, fieldOrIndex, subField] = name.split(/[.\[\]]/).filter(Boolean);
-
-            if (subField) {
-                // Handle array fields (e.g., plaintiffAddress[0].homeAddress)
-                const index = parseInt(fieldOrIndex, 10); // Extract the array index
-                setFormData((prevData) => ({
-                    ...prevData,
-                    [section]: {
-                        ...prevData[section],
-                        [fieldOrIndex]: prevData[section][fieldOrIndex].map((item, i) =>
-                            i === index ? { ...item, [subField]: value } : item
-                        ),
-                    },
-                }));
-            } else {
-                // Handle non-array fields (e.g., plaintiffName)
-                setFormData((prevData) => ({
-                    ...prevData,
-                    [section]: {
-                        ...prevData[section],
-                        [fieldOrIndex]: value,
-                    },
-                }));
-            }
-        }
-        // Handle lawyer fields
-        else if (name.startsWith("lawyer.")) {
+            const [section, field] = name.split(".");
+            setFormData((prevData) => ({
+                ...prevData,
+                [section]: {
+                    ...prevData[section],
+                    [field]: value,
+                },
+            }));
+        } else if (name.startsWith("lawyer.")) {
             const [section, subSection, field] = name.split(".");
-
             if (subSection === "contactInfo") {
-                // Handle lawyer.contactInfo fields (e.g., lawyer.contactInfo.officeAddress)
                 setFormData((prevData) => ({
                     ...prevData,
                     lawyer: {
@@ -110,7 +91,6 @@ const RegisterLegalCase = () => {
                     },
                 }));
             } else if (subSection === "barRegistration") {
-                // Handle lawyer.barRegistration fields (e.g., lawyer.barRegistration.barAssociationID)
                 setFormData((prevData) => ({
                     ...prevData,
                     lawyer: {
@@ -122,7 +102,6 @@ const RegisterLegalCase = () => {
                     },
                 }));
             } else {
-                // Handle other lawyer fields (e.g., lawyer.LawyerFullName, lawyer.lawFirmName, lawyer.firmAddress)
                 setFormData((prevData) => ({
                     ...prevData,
                     lawyer: {
@@ -131,9 +110,7 @@ const RegisterLegalCase = () => {
                     },
                 }));
             }
-        }
-        // Handle top-level fields
-        else {
+        } else {
             setFormData((prevData) => ({
                 ...prevData,
                 [name]: value,
@@ -151,24 +128,42 @@ const RegisterLegalCase = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Legal Case Submitted:", formData);
+
+        // Optional: Add form validation if needed
+        // if (!validateForm()) return;
+
+        setLoading(true); // Indicate loading state (if you have a loading state)
+
         try {
-            const response = await fetch("http://localhost:5000/legalcase/create-legal-case", {
-                method: "POST",
+            // Configure Axios to include credentials
+            axios.defaults.withCredentials = true;
+
+            // Prepare the payload (formData is already structured correctly)
+            const payload = formData;
+
+            // Log the payload for debugging purposes
+            console.log("Sending Payload:", payload);
+
+            // Send the POST request to the backend
+            const { data } = await axios.post("http://localhost:8000/legalcase/create-legal-case", payload, {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(formData),
             });
-            if (response.ok) {
-                alert("Legal case created successfully!");
-                navigate("/dashboard");
+
+            // Handle success response
+            if (data.success) {
+                toast.success("Legal case created successfully!");
+                navigate("/dashboard"); // Redirect to the dashboard or another page
             } else {
-                alert("Failed to create legal case. Please try again.");
+                toast.error(data.message || "Failed to create legal case.");
             }
         } catch (error) {
-            console.error("Error submitting legal case:", error);
-            alert("An error occurred while submitting the legal case.");
+            // Handle error response
+            const errorMessage = error.response?.data?.message || "Something went wrong!";
+            toast.error(errorMessage);
+        } finally {
+            setLoading(false); // Stop loading state
         }
     };
 
@@ -220,7 +215,6 @@ const RegisterLegalCase = () => {
                             Plaintiff Details
                         </Typography>
                         <Grid container spacing={2}>
-                            {/* Two-column layout */}
                             <Grid item xs={12} sm={6}>
                                 <TextField
                                     fullWidth
@@ -290,7 +284,6 @@ const RegisterLegalCase = () => {
                                     required
                                 />
                             </Grid>
-                            {/* Three-column layout */}
                             <Grid item xs={12} sm={4}>
                                 <TextField
                                     fullWidth
@@ -334,7 +327,6 @@ const RegisterLegalCase = () => {
                             Defendant Details
                         </Typography>
                         <Grid container spacing={2}>
-                            {/* Two-column layout */}
                             <Grid item xs={12} sm={6}>
                                 <TextField
                                     fullWidth
@@ -404,7 +396,6 @@ const RegisterLegalCase = () => {
                                     required
                                 />
                             </Grid>
-                            {/* Three-column layout */}
                             <Grid item xs={12} sm={4}>
                                 <TextField
                                     fullWidth
@@ -473,7 +464,6 @@ const RegisterLegalCase = () => {
                             margin="normal"
                             required
                         />
-                        {/* Law Firm Details */}
                         <Typography variant="subtitle2" style={{ marginTop: "10px" }}>
                             Law Firm Details
                         </Typography>
@@ -501,7 +491,6 @@ const RegisterLegalCase = () => {
                                 />
                             </Grid>
                         </Grid>
-                        {/* Personal Contact Information */}
                         <Typography variant="subtitle2" style={{ marginTop: "10px" }}>
                             Personal Contact Information
                         </Typography>
@@ -541,7 +530,6 @@ const RegisterLegalCase = () => {
                                 />
                             </Grid>
                         </Grid>
-                        {/* Bar Registration Details */}
                         <Typography variant="subtitle2" style={{ marginTop: "10px" }}>
                             Bar Registration Details
                         </Typography>
