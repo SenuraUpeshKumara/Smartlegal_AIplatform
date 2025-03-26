@@ -193,6 +193,9 @@ const userAuth = async (req, res, next) => {
   }
 };
 
+//
+
+//
 //send verify otp
 router.post("/send-verify-OTP", userAuth, async (req, res) => {
   try {
@@ -229,6 +232,11 @@ router.post("/send-verify-OTP", userAuth, async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
+// verifyToken.js (middleware)
+
+
+
 
 //verify email using OTP
 router.post("/verify-account", userAuth, async (req, res) => {
@@ -370,14 +378,14 @@ router.get("/data", userAuth, async (req, res) => {
     res.json({
       success: true,
       userData: {
-        id: user.id,
+        id: user._id,
         name: user.name,
         contactNo: user.contactNo,
         email: user.email,
         isAccountVerified: user.isAccountVerified,
         verifyOTP: user.verifyOTP,
         role: user.role,
-        categoryName: user.categoryName,
+       // categoryName: user.categoryName,
       },
     });
   } catch (err) {

@@ -27,7 +27,7 @@ const AppContextProvider = ({ children }) => {
 
     const getAuthState = async () => {
         try {
-            const { data } = await axios.get(`${backendUrl}/auth/is-auth`);
+            const { data } = await axios.get(`${backendUrl}/user/is-auth`);
             if (data.success) {
                 setIsLoggedin(true);
                 getUserData();
