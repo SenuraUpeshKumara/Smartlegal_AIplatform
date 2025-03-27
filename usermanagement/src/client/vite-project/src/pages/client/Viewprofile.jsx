@@ -1,33 +1,81 @@
-import React, { useContext } from "react";
-import { AppContent } from "./Appcontext.jsx"; // ✅ Corrected import path
-import { Box, Typography, Paper, CircularProgress, Alert } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Card, CardContent, Typography, CircularProgress, Alert, Container, Button, Stack } from "@mui/material";
+import AddClient from "./AddClient"; // Import your AddClient component
 
 const ViewProfile = () => {
-    const context = useContext(AppContent); // ✅ Ensure context is used properly
+    const [userData, setUserData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [showAddClient, setShowAddClient] = useState(false); // Toggle AddClient form
+    const navigate = useNavigate(); // Hook for navigation
 
-    if (!context) {
-        return <Alert severity="error">Context not available</Alert>;
-    }
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const response = await fetch("http://localhost:8000/user/data", {
+                    method: "GET",
+                    credentials: "include",
+                });
 
-    const { userData } = context;
+                const data = await response.json();
 
-    if (!userData) {
-        return <CircularProgress />;
-    }
+                if (data.success) {
+                    setUserData(data.userData);
+                } else {
+                    setError("Failed to fetch user data");
+                }
+            } catch (error) {
+                setError("Error fetching user data");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchUserData();
+    }, []);
 
     return (
-        <Box sx={{ display: "flex", justifyContent: "center", padding: "20px" }}>
-            <Paper sx={{ width: "100%", maxWidth: "600px", padding: "20px" }}>
-                <Typography variant="h5" gutterBottom sx={{ textAlign: "center", fontWeight: "bold" }}>
-                    Client Profile
-                </Typography>
+        <Container maxWidth="sm" sx={{ mt: 5 }}>
+            {/* Loading and Error Handling */}
+            {loading && <CircularProgress sx={{ display: "block", mx: "auto" }} />}
+            {error && <Alert severity="error">{error}</Alert>}
 
-                <Typography variant="subtitle1"><strong>Name:</strong> {userData.name}</Typography>
-                <Typography variant="subtitle1"><strong>Contact Number:</strong> {userData.contactNo}</Typography>
-                <Typography variant="subtitle1"><strong>Email:</strong> {userData.email}</Typography>
-                <Typography variant="subtitle1"><strong>Role:</strong> {userData.role}</Typography>
-            </Paper>
-        </Box>
+            {/* Profile Details - Always Visible */}
+            {userData && (
+                <Card sx={{ p: 3, boxShadow: 3, mb: 3 }}> {/* Margin-bottom to separate from AddClient */}
+                    <CardContent>
+                        <Typography variant="h5" gutterBottom>
+                            Welcome, {userData.name}
+                        </Typography>
+                        <Typography variant="body1"><strong>Email:</strong> {userData.email}</Typography>
+                        <Typography variant="body1"><strong>Contact No:</strong> {userData.contactNo}</Typography>
+                        <Typography variant="body1"><strong>Role:</strong> {userData.role}</Typography>
+
+                        <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
+                            <Button 
+                                variant="contained" 
+                                color="primary" 
+                                onClick={() => setShowAddClient(!showAddClient)} // Toggle AddClient component
+                            >
+                                {showAddClient ? "Hide Add Client" : "Add More"}
+                            </Button>
+
+                            <Button 
+                                variant="contained" 
+                                color="secondary" 
+                                onClick={() => navigate("/edit-profile")} // Navigate to edit profile page
+                            >
+                                Edit Profile
+                            </Button>
+                        </Stack>
+                    </CardContent>
+                </Card>
+            )}
+
+            {/* Add Client Form - Conditionally Rendered */}
+            {showAddClient && <AddClient onClose={() => setShowAddClient(false)} />}
+        </Container>
     );
 };
 
