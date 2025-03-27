@@ -17,6 +17,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import axios from "axios"; // Import Axios
 import { toast } from "react-toastify";
+import { useDropzone } from "react-dropzone"; // Import react-dropzone for file uploads
 
 const RegisterLegalCase = () => {
     const [formData, setFormData] = useState({
@@ -60,6 +61,7 @@ const RegisterLegalCase = () => {
             },
             representStatus: "Plaintiff",
         },
+        evidenceFiles: [], // Add this field to store uploaded files
     });
     const [activeStep, setActiveStep] = useState(0);
     const [loading, setLoading] = useState(false);
@@ -118,6 +120,15 @@ const RegisterLegalCase = () => {
         }
     };
 
+    // Handle file uploads
+    const onDrop = (acceptedFiles) => {
+        setFormData((prevData) => ({
+            ...prevData,
+            evidenceFiles: [...prevData.evidenceFiles, ...acceptedFiles], // Append new files
+        }));
+    };
+    const { getRootProps, getInputProps } = useDropzone({ onDrop });
+
     const handleNext = () => {
         setActiveStep((prevStep) => prevStep + 1);
     };
@@ -128,33 +139,44 @@ const RegisterLegalCase = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        // Optional: Add form validation if needed
-        // if (!validateForm()) return;
-
-        setLoading(true); // Indicate loading state (if you have a loading state)
-
+        setLoading(true); // Indicate loading state
         try {
+            // Create a FormData object
+            const formDataToSend = new FormData();
+            // Append non-file fields to FormData
+            formDataToSend.append("caseTitle", formData.caseTitle);
+            formDataToSend.append("caseType", formData.caseType);
+            formDataToSend.append("caseDescription", formData.caseDescription);
+            // Append nested objects as JSON strings
+            formDataToSend.append("plaintiff", JSON.stringify(formData.plaintiff));
+            formDataToSend.append("defendant", JSON.stringify(formData.defendant));
+            formDataToSend.append("lawyer", JSON.stringify(formData.lawyer));
+            // Append files to FormData
+            formData.evidenceFiles.forEach((file) => {
+                formDataToSend.append("evidenceFiles", file);
+            });
+
             // Configure Axios to include credentials
             axios.defaults.withCredentials = true;
 
-            // Prepare the payload (formData is already structured correctly)
-            const payload = formData;
-
-            // Log the payload for debugging purposes
-            console.log("Sending Payload:", payload);
-
-            // Send the POST request to the backend
-            const { data } = await axios.post("http://localhost:8000/legalcase/create-legal-case", payload, {
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
+            // Send the POST request to the backend with multipart/form-data
+            const { data } = await axios.post(
+                "http://localhost:8000/legalcase/create-legal-case",
+                formDataToSend,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data", // Use multipart/form-data for file uploads
+                    },
+                }
+            );
 
             // Handle success response
             if (data.success) {
                 toast.success("Legal case created successfully!");
-                navigate("/dashboard"); // Redirect to the dashboard or another page
+                // Extract the _id from the response
+                const caseId = data.data.id;
+                // Navigate to the ViewDetails page with the case ID
+                navigate(`/view-legal-case/${caseId}`);
             } else {
                 toast.error(data.message || "Failed to create legal case.");
             }
@@ -167,7 +189,13 @@ const RegisterLegalCase = () => {
         }
     };
 
-    const steps = ["Case Details", "Plaintiff Details", "Defendant Details", "Lawyer Details"];
+    const steps = [
+        "Case Details",
+        "Plaintiff Details",
+        "Defendant Details",
+        "Lawyer Details",
+        "Upload Evidence",
+    ];
 
     const renderStepContent = (step) => {
         switch (step) {
@@ -561,6 +589,43 @@ const RegisterLegalCase = () => {
                         </Grid>
                     </Box>
                 );
+            case 4:
+                return (
+                    <Box>
+                        <Typography variant="h6" gutterBottom>
+                            Upload Evidence
+                        </Typography>
+                        <Box
+                            {...getRootProps()}
+                            sx={{
+                                border: "2px dashed #ccc",
+                                borderRadius: "4px",
+                                padding: "20px",
+                                textAlign: "center",
+                                cursor: "pointer",
+                                marginTop: "10px",
+                            }}
+                        >
+                            <input {...getInputProps()} />
+                            <Typography variant="body1">
+                                Drag & drop files here, or click to select files
+                            </Typography>
+                            <Typography variant="caption" color="textSecondary">
+                                Supported formats: PDF, JPG, PNG
+                            </Typography>
+                        </Box>
+                        {formData.evidenceFiles.length > 0 && (
+                            <Box mt={2}>
+                                <Typography variant="subtitle1">Uploaded Files:</Typography>
+                                <ul>
+                                    {formData.evidenceFiles.map((file, index) => (
+                                        <li key={index}>{file.name}</li>
+                                    ))}
+                                </ul>
+                            </Box>
+                        )}
+                    </Box>
+                );
             default:
                 return null;
         }
@@ -586,15 +651,26 @@ const RegisterLegalCase = () => {
                             variant="outlined"
                             onClick={handleBack}
                             disabled={activeStep === 0}
+                            type="button" // Prevent form submission
                         >
                             Back
                         </Button>
                         {activeStep === steps.length - 1 ? (
-                            <Button variant="contained" color="primary" type="submit">
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                type="submit"
+                                disabled={formData.evidenceFiles.length === 0} // Disable submit if no files are uploaded
+                            >
                                 Submit
                             </Button>
                         ) : (
-                            <Button variant="contained" color="primary" onClick={handleNext}>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={handleNext}
+                                type="button" // Prevent form submission
+                            >
                                 Next
                             </Button>
                         )}

@@ -4,6 +4,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import RegisterLegalCase from './pages/RegisterLegalCase';
+import ViewCaseDetails from './pages/ViewCaseDetails';
 
 const App = () => {
   return (
@@ -11,6 +12,7 @@ const App = () => {
       <ToastContainer />
       <Routes>
         <Route path='/' element={<RegisterLegalCase />} />
+        <Route path='/view-legal-case/:id' element={<ViewCaseDetails />} />
       </Routes>
     </div>
   );
