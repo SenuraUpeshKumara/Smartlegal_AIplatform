@@ -24,7 +24,7 @@ const allowedOrigins = ["http://localhost:5173"]; // Use HTTP instead of HTTPS f
 app.use(
   cors({
     origin: allowedOrigins,
-    methods: ["GET", "POST", "PUT","PATCH", "DELETE"],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true, // Allow cookies
   })
