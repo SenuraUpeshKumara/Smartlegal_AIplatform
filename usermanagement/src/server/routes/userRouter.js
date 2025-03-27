@@ -24,7 +24,7 @@ router.post("/signup", async (req, res) => {
     return res
       .status(400)
       .json({
-        message: "Name, Contact Number, Email, Password, and Role are required",
+        message: "Name, ContactNo, Email, Password, and Role are required",
       });
   }
 
@@ -47,8 +47,8 @@ router.post("/signup", async (req, res) => {
       email,
       password: hashedPassword,
       role,
-      ...(role === "customer" && { companyID }), // Include companyID for customers
-      ...(role === "engineer" && { categoryName }), // Include categoryName for engineers
+      ...(role === "customer" && { companyID }), // Include companyID for customers //customer // companyID
+      ...(role === "engineer" && { categoryName }), // Include categoryName for engineers // engineer // categoryName
     });
 
     // Save the user
@@ -104,30 +104,40 @@ Use these credentials to access our website. Thank you!`,
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
+  // Hardcoded admin credentials
+  const ADMIN_EMAIL = "admin@example.com";
+  const ADMIN_PASSWORD = "Admin@123"; // Store securely in env variables in production
+
   try {
+    // Check if login credentials match the hardcoded admin credentials
+    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+      // Use a dummy ObjectId-like value for admin or handle separately
+      const token = jwt.sign({ id: "admin" }, process.env.KEY, { expiresIn: "7d" });
+      res.cookie("token", token, { httpOnly: true, secure: true, sameSite: "none" });
+      return res.json({ success: true, role: "admin", message: "Admin login successful" });
+  }
+  
+    // Check database for other users
     const user = await User.findOne({ email });
-    if (!user) {
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
-    }
+if (!user) {
+  return res.status(404).json({ success: false, message: "User not found" });
+}
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid credentials" });
-    }
+const isPasswordValid = await bcrypt.compare(password, user.password);
+if (!isPasswordValid) {
+  return res.status(400).json({ success: false, message: "Invalid credentials" });
+}
 
-    const token = jwt.sign({ id: user._id }, process.env.KEY, {
-      expiresIn: "7d",
-    });
+const token = jwt.sign({ id: user._id }, process.env.KEY, {
+  expiresIn: "7d",
+});
+
+
     res.cookie("token", token, { httpOnly: true, secure: true, sameSite: "none" });
-    //corrected
 
     res.json({
       success: true,
-      role: user.role, // Include the role in the response
+      role: user.role,
       message: "Login successful",
     });
   } catch (error) {
@@ -152,31 +162,64 @@ router.post("/logout", async (req, res) => {
 });
 
 
+// userAuth middleware
 const userAuth = async (req, res, next) => {
   const { token } = req.cookies;
-  //corrected
-  console.log("Token from cookies:", token); // Log the token
   if (!token) {
-    return res.json({ success: false, message: "Not Authorized! Login again" });
+      return res.json({ success: false, message: "Not Authorized! Login again" });
   }
+
   try {
-    const tokenDecode = jwt.verify(token, process.env.KEY);
-    console.log("Decoded token:", tokenDecode); // Log the decoded token
-    if (tokenDecode.id) {
-      req.body.userID = tokenDecode.id;
-    } else {
-      return res.json({
-        success: false,
-        message: "Not Authirized! Login again",
-      });
-    }
-    next();
+      const tokenDecode = jwt.verify(token, process.env.KEY);
+      if (tokenDecode.id === "admin") {
+          req.body.userID = "admin"; // Set a special admin flag for admin users
+          next();
+      } else {
+          const user = await User.findById(tokenDecode.id); // Regular user ID
+          if (!user) {
+              return res.json({ success: false, message: "Not Authorized! Login again" });
+          }
+          req.body.userID = user._id;
+          next();
+      }
   } catch (err) {
-    console.error("Token verification error:", err.message); // Log the error
-    return res.json({ success: false, message: err.message });
+      console.error("Token verification error:", err.message);
+      return res.json({ success: false, message: err.message });
   }
 };
 
+
+// /data route (Get User Data)
+router.get("/data", userAuth, async (req, res) => {
+  try {
+    const { userID } = req.body; // Ensure we are using userID from the request body
+    const user = await User.findById(userID); // Use the userID to fetch the user from the database
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    res.json({
+      success: true,
+      userData: {
+        id: user._id,
+        name: user.name,
+        contactNo: user.contactNo,
+        email: user.email,
+        role: user.role,
+        isAccountVerified: user.isAccountVerified,
+      },
+    });
+  } catch (err) {
+    console.error("Error fetching user data:", err);
+    return res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+});
+
+
+//
+
+//
 //send verify otp
 router.post("/send-verify-OTP", userAuth, async (req, res) => {
   try {
@@ -213,6 +256,11 @@ router.post("/send-verify-OTP", userAuth, async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
+// verifyToken.js (middleware)
+
+
+
 
 //verify email using OTP
 router.post("/verify-account", userAuth, async (req, res) => {
@@ -310,18 +358,15 @@ router.post("/reset-password", async (req, res) => {
 
   try {
     const user = await User.findOne({ email });
-
     if (!user) {
-      return res.json({ success: false, message: "User not found" });
+        return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    if (user.ResetOTP === "" || user.ResetOTP !== OTP) {
-      return res.json({ success: false, message: "Invalid OTP" });
-    }
-
-    if (user.resetOTPexpireAt < Date.now()) {
-      return res.json({ success: false, message: "OTP expired" });
-    }
+    if (user.role === "admin") {
+      const token = jwt.sign({ id: user._id }, process.env.KEY, { expiresIn: "7d" });
+      res.cookie("token", token, { httpOnly: true, secure: true, sameSite: "none" });
+      return res.json({ success: true, role: "admin", message: "Admin login successful" });
+  }
 
     const hashPassword = await bcrypt.hash(newPassword, 10);
 
@@ -343,31 +388,29 @@ router.post("/reset-password", async (req, res) => {
 //get user data
 router.get("/data", userAuth, async (req, res) => {
   try {
-    const { userID } = req.body;
-
-    const user = await User.findById(userID);
+    const user = await User.findById(req.body.userID);
 
     if (!user) {
-      return res.json({ success: false, message: "User not found" });
+      return res.status(404).json({ success: false, message: "User not found" });
     }
 
     res.json({
       success: true,
       userData: {
-        id: user.id,
+        id: user._id,
         name: user.name,
         contactNo: user.contactNo,
         email: user.email,
-        isAccountVerified: user.isAccountVerified,
-        verifyOTP: user.verifyOTP,
         role: user.role,
-        categoryName: user.categoryName,
+        isAccountVerified: user.isAccountVerified,
       },
     });
   } catch (err) {
-    return res.json({ success: false, message: err.message });
+    console.error("Error fetching user data:", err);
+    return res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 });
+
 
 
 
