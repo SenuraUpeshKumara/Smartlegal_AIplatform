@@ -15,6 +15,9 @@ import {
     StepLabel,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import axios from "axios"; // Import Axios
+import { toast } from "react-toastify";
+import { useDropzone } from "react-dropzone"; // Import react-dropzone for file uploads
 
 const RegisterLegalCase = () => {
     const [formData, setFormData] = useState({
@@ -58,47 +61,27 @@ const RegisterLegalCase = () => {
             },
             representStatus: "Plaintiff",
         },
+        evidenceFiles: [], // Add this field to store uploaded files
     });
-
     const [activeStep, setActiveStep] = useState(0);
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
+    // Handle input changes for nested fields
     const handleChange = (e) => {
         const { name, value } = e.target;
-
-        // Handle nested fields like plaintiff and defendant
         if (name.startsWith("plaintiff.") || name.startsWith("defendant.")) {
-            const [section, fieldOrIndex, subField] = name.split(/[.\[\]]/).filter(Boolean);
-
-            if (subField) {
-                // Handle array fields (e.g., plaintiffAddress[0].homeAddress)
-                const index = parseInt(fieldOrIndex, 10); // Extract the array index
-                setFormData((prevData) => ({
-                    ...prevData,
-                    [section]: {
-                        ...prevData[section],
-                        [fieldOrIndex]: prevData[section][fieldOrIndex].map((item, i) =>
-                            i === index ? { ...item, [subField]: value } : item
-                        ),
-                    },
-                }));
-            } else {
-                // Handle non-array fields (e.g., plaintiffName)
-                setFormData((prevData) => ({
-                    ...prevData,
-                    [section]: {
-                        ...prevData[section],
-                        [fieldOrIndex]: value,
-                    },
-                }));
-            }
-        }
-        // Handle lawyer fields
-        else if (name.startsWith("lawyer.")) {
+            const [section, field] = name.split(".");
+            setFormData((prevData) => ({
+                ...prevData,
+                [section]: {
+                    ...prevData[section],
+                    [field]: value,
+                },
+            }));
+        } else if (name.startsWith("lawyer.")) {
             const [section, subSection, field] = name.split(".");
-
             if (subSection === "contactInfo") {
-                // Handle lawyer.contactInfo fields (e.g., lawyer.contactInfo.officeAddress)
                 setFormData((prevData) => ({
                     ...prevData,
                     lawyer: {
@@ -110,7 +93,6 @@ const RegisterLegalCase = () => {
                     },
                 }));
             } else if (subSection === "barRegistration") {
-                // Handle lawyer.barRegistration fields (e.g., lawyer.barRegistration.barAssociationID)
                 setFormData((prevData) => ({
                     ...prevData,
                     lawyer: {
@@ -122,7 +104,6 @@ const RegisterLegalCase = () => {
                     },
                 }));
             } else {
-                // Handle other lawyer fields (e.g., lawyer.LawyerFullName, lawyer.lawFirmName, lawyer.firmAddress)
                 setFormData((prevData) => ({
                     ...prevData,
                     lawyer: {
@@ -131,15 +112,22 @@ const RegisterLegalCase = () => {
                     },
                 }));
             }
-        }
-        // Handle top-level fields
-        else {
+        } else {
             setFormData((prevData) => ({
                 ...prevData,
                 [name]: value,
             }));
         }
     };
+
+    // Handle file uploads
+    const onDrop = (acceptedFiles) => {
+        setFormData((prevData) => ({
+            ...prevData,
+            evidenceFiles: [...prevData.evidenceFiles, ...acceptedFiles], // Append new files
+        }));
+    };
+    const { getRootProps, getInputProps } = useDropzone({ onDrop });
 
     const handleNext = () => {
         setActiveStep((prevStep) => prevStep + 1);
@@ -151,28 +139,63 @@ const RegisterLegalCase = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Legal Case Submitted:", formData);
+        setLoading(true); // Indicate loading state
         try {
-            const response = await fetch("http://localhost:5000/legalcase/create-legal-case", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(formData),
+            // Create a FormData object
+            const formDataToSend = new FormData();
+            // Append non-file fields to FormData
+            formDataToSend.append("caseTitle", formData.caseTitle);
+            formDataToSend.append("caseType", formData.caseType);
+            formDataToSend.append("caseDescription", formData.caseDescription);
+            // Append nested objects as JSON strings
+            formDataToSend.append("plaintiff", JSON.stringify(formData.plaintiff));
+            formDataToSend.append("defendant", JSON.stringify(formData.defendant));
+            formDataToSend.append("lawyer", JSON.stringify(formData.lawyer));
+            // Append files to FormData
+            formData.evidenceFiles.forEach((file) => {
+                formDataToSend.append("evidenceFiles", file);
             });
-            if (response.ok) {
-                alert("Legal case created successfully!");
-                navigate("/dashboard");
+
+            // Configure Axios to include credentials
+            axios.defaults.withCredentials = true;
+
+            // Send the POST request to the backend with multipart/form-data
+            const { data } = await axios.post(
+                "http://localhost:8000/legalcase/create-legal-case",
+                formDataToSend,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data", // Use multipart/form-data for file uploads
+                    },
+                }
+            );
+
+            // Handle success response
+            if (data.success) {
+                toast.success("Legal case created successfully!");
+                // Extract the _id from the response
+                const caseId = data.data.id;
+                // Navigate to the ViewDetails page with the case ID
+                navigate(`/view-legal-case/${caseId}`);
             } else {
-                alert("Failed to create legal case. Please try again.");
+                toast.error(data.message || "Failed to create legal case.");
             }
         } catch (error) {
-            console.error("Error submitting legal case:", error);
-            alert("An error occurred while submitting the legal case.");
+            // Handle error response
+            const errorMessage = error.response?.data?.message || "Something went wrong!";
+            toast.error(errorMessage);
+        } finally {
+            setLoading(false); // Stop loading state
         }
     };
 
-    const steps = ["Case Details", "Plaintiff Details", "Defendant Details", "Lawyer Details"];
+    const steps = [
+        "Case Details",
+        "Plaintiff Details",
+        "Defendant Details",
+        "Lawyer Details",
+        "Upload Evidence",
+    ];
 
     const renderStepContent = (step) => {
         switch (step) {
@@ -220,7 +243,6 @@ const RegisterLegalCase = () => {
                             Plaintiff Details
                         </Typography>
                         <Grid container spacing={2}>
-                            {/* Two-column layout */}
                             <Grid item xs={12} sm={6}>
                                 <TextField
                                     fullWidth
@@ -290,7 +312,6 @@ const RegisterLegalCase = () => {
                                     required
                                 />
                             </Grid>
-                            {/* Three-column layout */}
                             <Grid item xs={12} sm={4}>
                                 <TextField
                                     fullWidth
@@ -334,7 +355,6 @@ const RegisterLegalCase = () => {
                             Defendant Details
                         </Typography>
                         <Grid container spacing={2}>
-                            {/* Two-column layout */}
                             <Grid item xs={12} sm={6}>
                                 <TextField
                                     fullWidth
@@ -404,7 +424,6 @@ const RegisterLegalCase = () => {
                                     required
                                 />
                             </Grid>
-                            {/* Three-column layout */}
                             <Grid item xs={12} sm={4}>
                                 <TextField
                                     fullWidth
@@ -473,7 +492,6 @@ const RegisterLegalCase = () => {
                             margin="normal"
                             required
                         />
-                        {/* Law Firm Details */}
                         <Typography variant="subtitle2" style={{ marginTop: "10px" }}>
                             Law Firm Details
                         </Typography>
@@ -501,7 +519,6 @@ const RegisterLegalCase = () => {
                                 />
                             </Grid>
                         </Grid>
-                        {/* Personal Contact Information */}
                         <Typography variant="subtitle2" style={{ marginTop: "10px" }}>
                             Personal Contact Information
                         </Typography>
@@ -541,7 +558,6 @@ const RegisterLegalCase = () => {
                                 />
                             </Grid>
                         </Grid>
-                        {/* Bar Registration Details */}
                         <Typography variant="subtitle2" style={{ marginTop: "10px" }}>
                             Bar Registration Details
                         </Typography>
@@ -573,6 +589,43 @@ const RegisterLegalCase = () => {
                         </Grid>
                     </Box>
                 );
+            case 4:
+                return (
+                    <Box>
+                        <Typography variant="h6" gutterBottom>
+                            Upload Evidence
+                        </Typography>
+                        <Box
+                            {...getRootProps()}
+                            sx={{
+                                border: "2px dashed #ccc",
+                                borderRadius: "4px",
+                                padding: "20px",
+                                textAlign: "center",
+                                cursor: "pointer",
+                                marginTop: "10px",
+                            }}
+                        >
+                            <input {...getInputProps()} />
+                            <Typography variant="body1">
+                                Drag & drop files here, or click to select files
+                            </Typography>
+                            <Typography variant="caption" color="textSecondary">
+                                Supported formats: PDF, JPG, PNG
+                            </Typography>
+                        </Box>
+                        {formData.evidenceFiles.length > 0 && (
+                            <Box mt={2}>
+                                <Typography variant="subtitle1">Uploaded Files:</Typography>
+                                <ul>
+                                    {formData.evidenceFiles.map((file, index) => (
+                                        <li key={index}>{file.name}</li>
+                                    ))}
+                                </ul>
+                            </Box>
+                        )}
+                    </Box>
+                );
             default:
                 return null;
         }
@@ -598,15 +651,26 @@ const RegisterLegalCase = () => {
                             variant="outlined"
                             onClick={handleBack}
                             disabled={activeStep === 0}
+                            type="button" // Prevent form submission
                         >
                             Back
                         </Button>
                         {activeStep === steps.length - 1 ? (
-                            <Button variant="contained" color="primary" type="submit">
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                type="submit"
+                                disabled={formData.evidenceFiles.length === 0} // Disable submit if no files are uploaded
+                            >
                                 Submit
                             </Button>
                         ) : (
-                            <Button variant="contained" color="primary" onClick={handleNext}>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={handleNext}
+                                type="button" // Prevent form submission
+                            >
                                 Next
                             </Button>
                         )}
