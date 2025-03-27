@@ -27,10 +27,9 @@ const router = express.Router();
 // Serve static files (optional, for testing purposes)
 router.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
-router.post(
-  "/create-legal-case",
-  upload.array("evidenceFiles"), // Handle multiple files
-  async (req, res) => {
+
+// Create Legal Case Route
+router.post("/create-legal-case", upload.array("evidenceFiles"), async (req, res) => {
     try {
       const {
         caseTitle,
@@ -84,6 +83,32 @@ router.post(
   }
 );
 
+// Get All Legal Cases Route
+router.get("/get-all-legal-cases", async (req, res) => {
+  try {
+    const allCases = await LegalCase.find({}, "caseTitle caseType plaintiff lawyer caseStatus");
+
+    if (!allCases || allCases.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No legal cases found",
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "All legal cases retrieved successfully.",
+      cases: allCases,
+    });
+  } catch (error) {
+    console.error("Error fetching all legal cases:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+});
+
 // Get Legal Case by ID Route
 router.get("/get-legal-case/:id", async (req, res) => {
   try {
@@ -91,14 +116,18 @@ router.get("/get-legal-case/:id", async (req, res) => {
 
     // Validate the ID format
     if (!mongoose.Types.ObjectId.isValid(caseId)) {
-      return res.status(400).json({ success: false, message: "Invalid case ID" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid case ID" });
     }
 
     // Fetch the case from the database
     const caseData = await LegalCase.findById(caseId);
 
     if (!caseData) {
-      return res.status(404).json({ success: false, message: "Case not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Case not found" });
     }
 
     // Return the case data
@@ -106,6 +135,133 @@ router.get("/get-legal-case/:id", async (req, res) => {
   } catch (error) {
     console.error("Error fetching case details:", error);
     res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+// Update Case Status Route
+router.put("/update-case-status/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { caseStatus } = req.body;
+
+    // Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ success: false, message: "Invalid case ID" });
+    }
+
+    // Ensure caseStatus is either "pending" or "resolved"
+    if (!["pending", "resolved"].includes(caseStatus)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid case status. Allowed values: pending, resolved",
+      });
+    }
+
+    // Update the case status in the database
+    const updatedCase = await LegalCase.findByIdAndUpdate(
+      id,
+      { caseStatus },
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedCase) {
+      return res.status(404).json({ success: false, message: "Case not found" });
+    }
+
+    res.json({
+      success: true,
+      message: `Case status updated to '${caseStatus}' successfully.`,
+      case: updatedCase,
+    });
+  } catch (error) {
+    console.error("Error updating case status:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+// Add Evidence to Existing Case Route
+router.patch("/add-evidence/:id",upload.array("evidenceFiles"), async (req, res) => {
+
+    try {
+      const { id } = req.params;
+
+      // Validate the ID format
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Invalid case ID" });
+      }
+
+      // Find the case by ID
+      const legalCase = await LegalCase.findById(id);
+
+      if (!legalCase) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Case not found" });
+      }
+
+      // Process uploaded files
+      const newEvidenceFiles =
+        req.files?.map((file) => ({
+          fileName: file.originalname,
+          filePath: file.path,
+        })) || [];
+
+      // Append new files to the existing evidenceFiles array
+      legalCase.evidenceFiles = [
+        ...legalCase.evidenceFiles,
+        ...newEvidenceFiles,
+      ];
+
+      // Save the updated case
+      const updatedCase = await legalCase.save();
+
+      res.status(200).json({
+        success: true,
+        message: "Evidence added successfully.",
+        case: updatedCase,
+      });
+    } catch (error) {
+      console.error("Error adding evidence:", error);
+      res.status(500).json({ success: false, message: "Server error" });
+    }
+  }
+);
+
+// Delete Legal Case Route
+router.delete("/delete-legal-case/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Validate the ID format
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid case ID",
+      });
+    }
+
+    // Find and delete the case by ID
+    const deletedCase = await LegalCase.findByIdAndDelete(id);
+
+    if (!deletedCase) {
+      return res.status(404).json({
+        success: false,
+        message: "Case not found",
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Case deleted successfully.",
+    });
+  } catch (error) {
+    console.error("Error deleting case:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
   }
 });
 

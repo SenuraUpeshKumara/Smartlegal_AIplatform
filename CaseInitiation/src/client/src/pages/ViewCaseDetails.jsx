@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-
 import {
   Container,
   Paper,
+  Button,
   Typography,
   Box,
   Grid,
@@ -16,7 +16,6 @@ import {
   IconButton,
   Tooltip,
 } from "@mui/material";
-
 import {
   AssignmentIndOutlined,
   BusinessOutlined,
@@ -35,6 +34,7 @@ const ViewCaseDetails = () => {
   const { id } = useParams(); // Extract the ID from the URL
   const [caseDetails, setCaseDetails] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCaseDetails = async () => {
@@ -83,14 +83,11 @@ const ViewCaseDetails = () => {
       console.error("Invalid file object:", file);
       return null;
     }
-
     const { fileName, filePath } = file; // Extract the correct fields
-
     if (!fileName || !filePath) {
       console.error("Missing file properties:", file);
       return null;
     }
-
     const fileExtension = fileName.split(".").pop().toLowerCase();
     const fileUrl = `http://localhost:8000/${filePath.replace(/\\/g, "/")}`; // Ensure proper URL format
 
@@ -136,21 +133,35 @@ const ViewCaseDetails = () => {
     }
   };
 
-
   return (
-    <Container maxWidth="lg" sx={{ mt: 5 }}>
-      <Paper elevation={3} sx={{ p: 4, borderRadius: 3 }}>
-        {/* Title Section */}
+    <Container maxWidth="lg" sx={{ mt: 5, position: "relative" }}>
+      {/* View All Legal Cases Button */}
+      <Box
+        sx={{
+          position: "absolute",
+          top: 0,
+          right: 0,
+          zIndex: 10,
+          m: 2,
+        }}
+      >
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => navigate("/all-legal-cases")} // Adjust the route as needed
+        >
+          View All Legal Cases
+        </Button>
+      </Box>
+
+      <Paper elevation={2} sx={{ p: 2, borderRadius: 3 }}>
         <Box textAlign="center" mb={4}>
-          <Typography variant="h4" gutterBottom>
-            Case Details
-          </Typography>
-          <Chip
-            icon={<GavelOutlined />}
-            label={caseDetails.caseTitle}
-            color="primary"
-            sx={{ fontSize: "1rem", fontWeight: "bold" }}
-          />
+          <h1>
+            <strong className="text-blue-600">{caseDetails.caseTitle}</strong>
+          </h1>
+          <h4>
+            <strong>Status:</strong> <span className="text-blue-600">{caseDetails.caseStatus}</span>
+          </h4>
         </Box>
 
         {/* General Information Section */}
@@ -162,13 +173,19 @@ const ViewCaseDetails = () => {
             <Divider sx={{ mb: 2 }} />
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
-                <Typography><strong>Case Title:</strong> {caseDetails.caseTitle}</Typography>
+                <Typography>
+                  <strong>Case Title:</strong> {caseDetails.caseTitle}
+                </Typography>
               </Grid>
               <Grid item xs={12} sm={6}>
-                <Typography><strong>Case Type:</strong> {caseDetails.caseType}</Typography>
+                <Typography>
+                  <strong>Case Type:</strong> {caseDetails.caseType}
+                </Typography>
               </Grid>
               <Grid item xs={12}>
-                <Typography><strong>Case Description:</strong> {caseDetails.caseDescription}</Typography>
+                <Typography>
+                  <strong>Case Description:</strong> {caseDetails.caseDescription}
+                </Typography>
               </Grid>
             </Grid>
           </CardContent>
@@ -189,7 +206,6 @@ const ViewCaseDetails = () => {
                   ) : (
                     <Typography>No evidence files uploaded.</Typography>
                   )}
-
                 </Box>
               ) : (
                 <Typography>No evidence files uploaded.</Typography>
@@ -209,9 +225,7 @@ const ViewCaseDetails = () => {
               <Grid item xs={12} sm={6}>
                 <Tooltip title="Plaintiff Name">
                   <Typography>
-                    <Avatar sx={{ bgcolor: "primary.main", width: 24, height: 24, mr: 1 }}>
-                      P
-                    </Avatar>
+                    <Avatar sx={{ bgcolor: "primary.main", width: 24, height: 24, mr: 1 }}>P</Avatar>
                     <strong>Name:</strong> {caseDetails.plaintiff.plaintiffName}
                   </Typography>
                 </Tooltip>
@@ -271,9 +285,7 @@ const ViewCaseDetails = () => {
               <Grid item xs={12} sm={6}>
                 <Tooltip title="Defendant Name">
                   <Typography>
-                    <Avatar sx={{ bgcolor: "secondary.main", width: 24, height: 24, mr: 1 }}>
-                      D
-                    </Avatar>
+                    <Avatar sx={{ bgcolor: "secondary.main", width: 24, height: 24, mr: 1 }}>D</Avatar>
                     <strong>Name:</strong> {caseDetails.defendant.defendantName}
                   </Typography>
                 </Tooltip>
@@ -333,9 +345,7 @@ const ViewCaseDetails = () => {
               <Grid item xs={12} sm={6}>
                 <Tooltip title="Lawyer Full Name">
                   <Typography>
-                    <Avatar sx={{ bgcolor: "success.main", width: 24, height: 24, mr: 1 }}>
-                      L
-                    </Avatar>
+                    <Avatar sx={{ bgcolor: "success.main", width: 24, height: 24, mr: 1 }}>L</Avatar>
                     <strong>Full Name:</strong> {caseDetails.lawyer.LawyerFullName}
                   </Typography>
                 </Tooltip>
@@ -392,7 +402,22 @@ const ViewCaseDetails = () => {
           </CardContent>
         </Card>
 
-
+        <Box display="flex" justifyContent="center">
+          {caseDetails.caseStatus !== "resolved" && (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => navigate(`/update-case-details/${caseDetails._id}`)}
+            >
+              Update
+            </Button>
+          )}
+          {caseDetails.caseStatus === "resolved" && (
+            <Button variant="contained" color="secondary" disabled>
+              Case Resolved (No Updates Allowed)
+            </Button>
+          )}
+        </Box>
       </Paper>
     </Container>
   );
