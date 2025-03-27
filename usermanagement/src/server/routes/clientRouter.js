@@ -22,69 +22,37 @@ router.post(
   upload.fields([{ name: "agreements" }, { name: "other_documents" }]),
   async (req, res) => {
     try {
-      const {
-        Fullname,
-        dob,
-        homeaddress,
-        businessaddress,
-        NIC,
-        description,
-        
-        
-      } = req.body;
+      console.log('Received Body:', req.body);
+      console.log('Received Files:', req.files);
 
-      if (
-        !Fullname ||
-        !dob ||
-        !homeaddress ||
-        !businessaddress ||
-        !NIC ||
-        !description 
-      ) {
-        return res
-          .status(400)
-          .json({ success: false, message: "All fields are required." });
+      const { fullname, dob, homeaddress, businessaddress, description } = req.body;
+
+      if (!fullname || !dob || !homeaddress || !businessaddress || !description) {
+        return res.status(400).json({ success: false, message: "All fields are required." });
       }
 
-      const agreements = req.files["agreements"]
-        ? req.files["agreements"].map((file) => file.path)
-        : [];
-      const otherDocuments = req.files["other_documents"]
-        ? req.files["other_documents"].map((file) => file.path)
-        : [];
+      const agreements = req.files["agreements"] ? req.files["agreements"].map(file => file.path) : [];
+      const otherDocuments = req.files["other_documents"] ? req.files["other_documents"].map(file => file.path) : [];
 
       const newClient = new Client({
-        Fullname,
+        fullname,
         dob,
         homeaddress,
         businessaddress,
-        NIC,
-       
         description,
-      
         agreements,
         other_documents: otherDocuments,
       });
 
       const savedClient = await newClient.save();
-      res
-        .status(201)
-        .json({
-          success: true,
-          message: "Client created successfully.",
-          data: savedClient,
-        });
+      res.status(201).json({ success: true, message: "Client created successfully.", data: savedClient });
     } catch (error) {
-      res
-        .status(500)
-        .json({
-          success: false,
-          message: "Internal server error.",
-          error: error.message,
-        });
+      res.status(500).json({ success: false, message: "Internal server error.", error: error.message });
     }
   }
 );
+
+
 
 // Get a single client by ID
 router.get("/get-client/:id", async (req, res) => {
