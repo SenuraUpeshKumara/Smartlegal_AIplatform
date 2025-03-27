@@ -36,7 +36,7 @@ const ClientProfile = () => {
     clients.map((client) => (
       <TableRow key={client._id}>
         <TableCell>{client.name}</TableCell>
-        <TableCell>{client.NIC}</TableCell>
+        <TableCell>{client.nic}</TableCell>
         <TableCell>{client.casetype}</TableCell>
         <TableCell>{client.opposername}</TableCell>
       </TableRow>

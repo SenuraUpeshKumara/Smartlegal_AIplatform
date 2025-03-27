@@ -23,7 +23,7 @@ const UpdateClient = () => {
     dob: "",
     homeaddress: "",
     businessaddress: "",
-    NIC: "",
+    nic: "",
     description: "",
     agreements: [],
     other_documents: [],
@@ -46,7 +46,7 @@ const UpdateClient = () => {
             dob: data.data.dob || "",
             homeaddress: data.data.homeaddress || "",
             businessaddress: data.data.businessaddress || "",
-            NIC: data.data.NIC || "",
+            nic: data.data.nic || "",
             description: data.data.description || "",
             agreements: data.data.agreements || [],
             other_documents: data.data.other_documents || [],
@@ -122,7 +122,7 @@ const UpdateClient = () => {
             <TextField fullWidth label="Date of Birth" name="dob" type="date" value={formData.dob} onChange={handleChange} margin="normal" required sx={{ marginBottom: "15px" }} InputLabelProps={{ shrink: true }} />
             <TextField fullWidth label="Home Address" name="homeaddress" value={formData.homeaddress} onChange={handleChange} margin="normal" required sx={{ marginBottom: "15px" }} />
             <TextField fullWidth label="Business Address" name="businessaddress" value={formData.businessaddress} onChange={handleChange} margin="normal" required sx={{ marginBottom: "15px" }} />
-            <TextField fullWidth label="NIC" name="NIC" value={formData.NIC} onChange={handleChange} margin="normal" required sx={{ marginBottom: "15px" }} />
+            <TextField fullWidth label="nic" name="nic" value={formData.nic} onChange={handleChange} margin="normal" required sx={{ marginBottom: "15px" }} />
             <TextField fullWidth label="Description" name="description" value={formData.description} onChange={handleChange} margin="normal" required multiline rows={4} sx={{ marginBottom: "15px" }} />
 
             {/* File Uploads */}
