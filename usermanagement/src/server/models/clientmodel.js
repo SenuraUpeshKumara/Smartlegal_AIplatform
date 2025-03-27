@@ -1,12 +1,12 @@
 import mongoose from "mongoose";
 
 const ClientSchema = new mongoose.Schema({
-  Fullname: {
+  fullname: {
     type: String,
     required: true,
   },
   dob: {
-    type: Date,
+    type: String,
     required: true,
   },
   homeaddress: {
@@ -17,11 +17,7 @@ const ClientSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  NIC: {
-    type: String,
-    required: true,
-    unique: true,
-  },
+  
 
   description: {
     type: String,
