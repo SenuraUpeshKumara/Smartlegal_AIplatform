@@ -23,29 +23,23 @@ router.post(
   async (req, res) => {
     try {
       const {
-        name,
-        number,
-        address,
-        occupation,
+        Fullname,
+        dob,
+        homeaddress,
+        businessaddress,
         NIC,
-        casetype,
-        casetitle,
         description,
-        opposername,
-        opp_number,
+        
+        
       } = req.body;
 
       if (
-        !name ||
-        !number ||
-        !address ||
-        !occupation ||
+        !Fullname ||
+        !dob ||
+        !homeaddress ||
+        !businessaddress ||
         !NIC ||
-        !casetype ||
-        !casetitle ||
-        !description ||
-        !opposername ||
-        !opp_number
+        !description 
       ) {
         return res
           .status(400)
@@ -60,16 +54,14 @@ router.post(
         : [];
 
       const newClient = new Client({
-        name,
-        number,
-        address,
-        occupation,
+        Fullname,
+        dob,
+        homeaddress,
+        businessaddress,
         NIC,
-        casetype,
-        casetitle,
+       
         description,
-        opposername,
-        opp_number,
+      
         agreements,
         other_documents: otherDocuments,
       });

@@ -14,16 +14,31 @@ const AppContextProvider = ({ children }) => {
 
     const getUserData = async () => {
         try {
-            const { data } = await axios.get(`${backendUrl}/user/data`);
+            const response = await fetch("http://localhost:8000/user/data", {
+                method: "GET",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+            });
+    
+            if (!response.ok) {
+                console.error("Error fetching user data:", response.statusText);
+                return;
+            }
+            
+            const data = await response.json();
+    
             if (data.success) {
-                setUserData(data.userData);
+                console.log("User Data:", data.userData);
+                return data.userData;
             } else {
-                toast.error(data.message);
+                console.error("Error fetching user data:", data.message);
             }
         } catch (error) {
-            toast.error("Failed to fetch user data");
+            console.error("Error:", error);
         }
     };
+    
+      
 
     const getAuthState = async () => {
         try {
