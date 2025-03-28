@@ -12,9 +12,11 @@ import {
   DialogTitle,
 } from "@mui/material";
 
-const AddClient = ({ onClose, setClients }) => {
+const AddClient = ({ onClose, userData, onClientAdded }) => {
   const [formData, setFormData] = useState({
-    fullname: "",
+    fullname: userData?.name || "",
+    contactNo: userData?.contactNo || "",
+    email: userData?.email || "",
     dob: "",
     homeaddress: "",
     businessaddress: "",
@@ -31,12 +33,12 @@ const AddClient = ({ onClose, setClients }) => {
 
   const handleFileChange = (e) => {
     const { name, files } = e.target;
-    setFormData({ ...formData, [name]: [...files] });
+    setFormData({ ...formData, [name]: Array.from(files) });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     const formDataToSend = new FormData();
     Object.keys(formData).forEach((key) => {
       if (key === "agreements" || key === "other_documents") {
@@ -45,29 +47,23 @@ const AddClient = ({ onClose, setClients }) => {
         formDataToSend.append(key, formData[key]);
       }
     });
-
+  
     try {
-      const response = await fetch(
-        "http://localhost:8000/clientmanagement/create-client",
-        {
-          method: "POST",
-          body: formDataToSend,
-        }
-      );
-
+      const response = await fetch("http://localhost:8000/clientmanagement/create-client", {
+        method: "POST",
+        body: formDataToSend,
+      });
+  
       const data = await response.json();
       if (!response.ok) {
         alert(data.message || "Error adding client.");
       } else {
         setOpenSuccessDialog(true);
-
-        // ✅ Ensure setClients is a function before using it
-        if (typeof setClients === "function") {
-          setClients((prevClients) => [...prevClients, data.newClient]);
-        }
-
+        if (onClientAdded) onClientAdded(); // Notify parent to remove button
         setFormData({
           fullname: "",
+          contactNo: "",
+          email: "",
           dob: "",
           homeaddress: "",
           businessaddress: "",
@@ -80,150 +76,48 @@ const AddClient = ({ onClose, setClients }) => {
       console.error("Error submitting form:", error);
     }
   };
-
+  
   const handleClose = () => {
     setOpenSuccessDialog(false);
     onClose();
   };
-
+  
   return (
     <Box sx={{ display: "flex", justifyContent: "center", padding: "20px" }}>
       <Paper sx={{ width: "100%", maxWidth: "600px", padding: "20px" }}>
-        <Typography
-          variant="h5"
-          gutterBottom
-          sx={{ textAlign: "center", fontWeight: "bold" }}
-        >
+        <Typography variant="h5" gutterBottom sx={{ textAlign: "center", fontWeight: "bold" }}>
           Add Client
         </Typography>
 
         <form onSubmit={handleSubmit}>
-          {/* Basic Details */}
-          <TextField
-            fullWidth
-            label="Full Name"
-            name="fullname"
-            value={formData.fullname}
-            onChange={handleChange}
-            margin="normal"
-            required
-            sx={{ marginBottom: "15px" }}
-          />
-          <TextField
-            fullWidth
-            label="Date of Birth"
-            name="dob"
-            type="date"
-            InputLabelProps={{ shrink: true }}
-            value={formData.dob}
-            onChange={handleChange}
-            margin="normal"
-            required
-            sx={{ marginBottom: "15px" }}
-          />
-          <TextField
-            fullWidth
-            label="Home Address"
-            name="homeaddress"
-            value={formData.homeaddress}
-            onChange={handleChange}
-            margin="normal"
-            required
-            sx={{ marginBottom: "15px" }}
-          />
-          <TextField
-            fullWidth
-            label="Business Address"
-            name="businessaddress"
-            value={formData.businessaddress}
-            onChange={handleChange}
-            margin="normal"
-            required
-            sx={{ marginBottom: "15px" }}
-          />
-          <TextField
-            fullWidth
-            label="Case Description"
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            margin="normal"
-            required
-            multiline
-            rows={4}
-            sx={{ marginBottom: "15px" }}
-          />
+          <TextField fullWidth label="Full Name" name="fullname" value={formData.fullname} onChange={handleChange} margin="normal" required />
+          <TextField fullWidth label="Contact Number" name="contactNo" value={formData.contactNo} onChange={handleChange} margin="normal" required />
+          <TextField fullWidth label="Email" name="email" value={formData.email} onChange={handleChange} margin="normal" required />
+          <TextField fullWidth label="Date of Birth" name="dob" type="date" InputLabelProps={{ shrink: true }} value={formData.dob} onChange={handleChange} margin="normal" required />
+          <TextField fullWidth label="Home Address" name="homeaddress" value={formData.homeaddress} onChange={handleChange} margin="normal" required />
+          <TextField fullWidth label="Business Address" name="businessaddress" value={formData.businessaddress} onChange={handleChange} margin="normal" required />
+          <TextField fullWidth label="Case Description" name="description" value={formData.description} onChange={handleChange} margin="normal" required multiline rows={4} />
 
-          {/* File Uploads */}
-          <Typography variant="subtitle1" sx={{ marginTop: "15px" }}>
-            Upload Agreements:
-          </Typography>
-          <input
-            type="file"
-            name="agreements"
-            multiple
-            onChange={handleFileChange}
-            accept=".pdf,.doc,.docx"
-          />
+          <Typography variant="subtitle1" sx={{ marginTop: "15px" }}>Upload Agreements:</Typography>
+          <input type="file" name="agreements" multiple onChange={handleFileChange} accept=".pdf,.doc,.docx" />
 
-          <Typography variant="subtitle1" sx={{ marginTop: "15px" }}>
-            Upload Other Documents:
-          </Typography>
-          <input
-            type="file"
-            name="other_documents"
-            multiple
-            onChange={handleFileChange}
-            accept=".pdf,.doc,.docx"
-          />
+          <Typography variant="subtitle1" sx={{ marginTop: "15px" }}>Upload Other Documents:</Typography>
+          <input type="file" name="other_documents" multiple onChange={handleFileChange} accept=".pdf,.doc,.docx" />
 
-          {/* Buttons */}
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              gap: 2,
-              marginTop: "20px",
-            }}
-          >
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              sx={{
-                backgroundColor: "#3f51b5",
-                "&:hover": { backgroundColor: "#283593" },
-                padding: "10px 20px",
-              }}
-            >
-              Add Client
-            </Button>
-            <Button
-              variant="contained"
-              color="secondary"
-              sx={{
-                backgroundColor: "#e74c3c",
-                "&:hover": { backgroundColor: "#c0392b" },
-                padding: "10px 20px",
-              }}
-              onClick={onClose}
-            >
-              Back to Dashboard
-            </Button>
+          <Box sx={{ display: "flex", justifyContent: "center", gap: 2, marginTop: "20px" }}>
+            <Button type="submit" variant="contained" color="primary">Add Client</Button>
+            <Button variant="contained" color="secondary" onClick={onClose}>Back to Dashboard</Button>
           </Box>
         </form>
       </Paper>
 
-      {/* Success Popup Dialog */}
       <Dialog open={openSuccessDialog} onClose={handleClose}>
         <DialogTitle>Success</DialogTitle>
         <DialogContent>
           <Alert severity="success">Client successfully added!</Alert>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} color="primary" variant="contained">
-            OK
-          </Button>
+          <Button onClick={handleClose} color="primary" variant="contained">OK</Button>
         </DialogActions>
       </Dialog>
     </Box>
