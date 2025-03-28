@@ -189,6 +189,7 @@ router.delete("/delete-client/:id", async (req, res) => {
 });
 
 // Check if a client exists by email
+// Check if a client exists by email
 router.post("/check-client-exists", async (req, res) => {
   const { email } = req.body;
 
@@ -203,12 +204,15 @@ router.post("/check-client-exists", async (req, res) => {
   try {
     // Check if the email exists in the client table
     const clientExists = await Client.findOne({ email });
+
     if (clientExists) {
       return res.json({
         success: true,
         exists: true,
+        client: clientExists, // Return the full client data
       });
     }
+
     return res.json({
       success: true,
       exists: false,
