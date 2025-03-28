@@ -5,10 +5,17 @@ const ClientSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  dob: {
+  contactNo: {
     type: String,
     required: true,
   },
+
+  email: {
+    type: String,
+    required: true,
+
+  },
+  
   homeaddress: {
     type: String,
     required: true,
@@ -19,11 +26,16 @@ const ClientSchema = new mongoose.Schema({
   },
   
 
+  dob: {
+    type: String,
+    required: true,
+  },
+
   description: {
     type: String,
     required: true,
   },
-  
+ 
   agreements: {
     type: [String], // Stores file paths for uploaded agreements
     required: false,
