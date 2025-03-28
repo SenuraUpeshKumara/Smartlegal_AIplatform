@@ -6,11 +6,9 @@ import Navbar from './pages/component/Navbar'
 import Register from './pages/Admin/Register'
 import Lawyer from './pages/lawyer/lawyer';
 import Clienthome from './pages/client/Clienthome'
-//import Addclient from './pages/client/Addclient';
-import Clientprofile from './pages/client/clientprofile';
 import Editprofile from './pages/client/Editprofile'
 import Viewprofile from "./pages/client/Viewprofile";
-//import Caseinitiation from './pages/client/Caseinitiation'
+
 const App = () => {
   return (
     <div>
@@ -22,9 +20,10 @@ const App = () => {
         <Route path="/lawyer" element={<Lawyer/>}/>
         <Route path="/clienthome" element={<Clienthome/>}/>
        
-        <Route path="/clientprofile" element={<Clientprofile/>}/>
-        <Route path="/edit-profile" element={<Editprofile/>}/>
-        <Route path="/view-profile/:clientId" element={<Viewprofile />} />
+        <Route path="/edit-profile/:id" element={<Editprofile/>}/>
+        <Route path="/view-profile/:id" element={<Viewprofile/>}/>
+       
+       
    
 
 

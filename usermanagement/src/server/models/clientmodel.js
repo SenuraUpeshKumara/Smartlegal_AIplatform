@@ -1,14 +1,21 @@
 import mongoose from "mongoose";
 
 const ClientSchema = new mongoose.Schema({
-  Fullname: {
+  fullname: {
     type: String,
     required: true,
   },
-  dob: {
-    type: Date,
+  contactNo: {
+    type: String,
     required: true,
   },
+
+  email: {
+    type: String,
+    required: true,
+
+  },
+  
   homeaddress: {
     type: String,
     required: true,
@@ -17,17 +24,18 @@ const ClientSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  NIC: {
+  
+
+  dob: {
     type: String,
     required: true,
-    unique: true,
   },
 
   description: {
     type: String,
     required: true,
   },
-  
+ 
   agreements: {
     type: [String], // Stores file paths for uploaded agreements
     required: false,
