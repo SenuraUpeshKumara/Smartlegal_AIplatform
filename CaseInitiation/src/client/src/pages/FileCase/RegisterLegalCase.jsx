@@ -13,11 +13,33 @@ import {
     Stepper,
     Step,
     StepLabel,
+    AppBar,
+    Toolbar,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import axios from "axios"; // Import Axios
 import { toast } from "react-toastify";
 import { useDropzone } from "react-dropzone"; // Import react-dropzone for file uploads
+import Footer from "../components/footer";
+import NavBar from "../components/navbar";
+
+// // Navbar Component
+// const Navbar = () => {
+//     const navigate = useNavigate();
+
+//     return (
+//         <AppBar position="static">
+//             <Toolbar>
+//                 <Typography variant="h6" style={{ flexGrow: 1 }}>
+//                     Admin Panel
+//                 </Typography>
+//                 <Button color="inherit" onClick={() => navigate("/login")}>
+//                     Logout
+//                 </Button>
+//             </Toolbar>
+//         </AppBar>
+//     );
+// };
 
 const RegisterLegalCase = () => {
     const [formData, setFormData] = useState({
@@ -155,10 +177,8 @@ const RegisterLegalCase = () => {
             formData.evidenceFiles.forEach((file) => {
                 formDataToSend.append("evidenceFiles", file);
             });
-
             // Configure Axios to include credentials
             axios.defaults.withCredentials = true;
-
             // Send the POST request to the backend with multipart/form-data
             const { data } = await axios.post(
                 "http://localhost:8000/legalcase/create-legal-case",
@@ -169,7 +189,6 @@ const RegisterLegalCase = () => {
                     },
                 }
             );
-
             // Handle success response
             if (data.success) {
                 toast.success("Legal case created successfully!");
@@ -633,7 +652,11 @@ const RegisterLegalCase = () => {
 
     return (
         <Container maxWidth="lg">
-            <Paper elevation={3} style={{ padding: "20px", marginTop: "50px" }}>
+  
+            <NavBar />
+
+            {/* Main Content */}
+            <Paper elevation={3} style={{ padding: "20px", marginTop: "130px", marginBottom: "150px" }}>
                 <Typography variant="h4" align="center" gutterBottom>
                     Create Legal Case
                 </Typography>
@@ -677,6 +700,9 @@ const RegisterLegalCase = () => {
                     </Box>
                 </form>
             </Paper>
+
+            {/* Footer */}
+            <Footer />
         </Container>
     );
 };

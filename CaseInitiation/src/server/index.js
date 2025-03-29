@@ -7,6 +7,7 @@ import multer from "multer"; // Import multer for file uploads
 import path from "path";
 import { fileURLToPath } from "url";
 import { LegalCaseRouter } from "./routes/LegalCaseRouter.js";
+import { CaseRegisterRouter } from "./routes/CaseRegisterRouter.js";
 
 const app = express();
 dotenv.config(); // Ensure dotenv is loaded properly
@@ -63,6 +64,7 @@ mongoose
 
 // Routes
 app.use("/legalcase", LegalCaseRouter);
+app.use("/caseregister", CaseRegisterRouter);
 
 // Test Route
 app.get("/", (req, res) => {

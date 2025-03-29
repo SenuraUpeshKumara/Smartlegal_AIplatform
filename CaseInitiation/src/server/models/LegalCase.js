@@ -11,14 +11,17 @@ const LegalCaseSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+
   caseType: {
     type: String,
     required: true,
   },
+
   caseDescription: {
     type: String,
     required: true,
   },
+
   plaintiff: {
     plaintiffName: { type: String, required: true },
     plaintiffHomeAddress: { type: String, required: true },
@@ -30,6 +33,7 @@ const LegalCaseSchema = new mongoose.Schema({
     plaintiffEIN: { type: String, required: true },
     plaintiffTIN: { type: String, required: true },
   },
+
   defendant: {
     defendantName: { type: String, required: true },
     defendantHomeAddress: { type: String, required: true },
@@ -41,6 +45,7 @@ const LegalCaseSchema = new mongoose.Schema({
     defendantEIN: { type: String, required: true },
     defendantTIN: { type: String, required: true },
   },
+
   lawyer: {
     LawyerFullName: { type: String, required: true, trim: true },
     lawFirmName: { type: String, required: true, trim: true },
@@ -50,22 +55,27 @@ const LegalCaseSchema = new mongoose.Schema({
       phoneNo: { type: String, required: true },
       email: { type: String, required: true },
     },
+
     barRegistration: {
       barAssociationID: { type: String, required: true, trim: true },
       dateOfAdmission: { type: Date, required: true },
     },
+
     representStatus: {
       type: String,
       enum: ["Plaintiff", "Defendant"],
       required: true,
     },
+
   },
+
   evidenceFiles: [
     {
-      fileName: { type: String, required: true },
-      filePath: { type: String, required: true },
+      fileName: { type: String },
+      filePath: { type: String },
     },
   ], // Array to store uploaded files
+  
 });
 
 const LegalCase = mongoose.model("LegalCase", LegalCaseSchema);

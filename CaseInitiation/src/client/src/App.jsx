@@ -3,10 +3,10 @@ import { Routes, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import RegisterLegalCase from './pages/RegisterLegalCase';
-import ViewCaseDetails from './pages/ViewCaseDetails';
-import UpdateLegalCase from './pages/UpdateLegalCase';
-import AllLegalCases from './pages/AllLegalCases';
+import RegisterLegalCase from './pages/FileCase/RegisterLegalCase';
+import ViewCaseDetails from './pages/FileCase/ViewCaseDetails';
+import UpdateLegalCase from './pages/FileCase/UpdateLegalCase';
+import AllLegalCases from './pages/FileCase/AllLegalCases';
 
 const App = () => {
   return (
