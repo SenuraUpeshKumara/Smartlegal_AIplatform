@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   Container,
-  Typography,
+  Typographyyy,
   Box,
   Card,
   Button,
