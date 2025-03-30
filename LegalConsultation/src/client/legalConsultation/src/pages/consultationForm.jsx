@@ -4,7 +4,7 @@ import { TextField, MenuItem, Button, Container, Typography, Box } from "@mui/ma
 const ConsultationForm = () => {
   const [formData, setFormData] = useState({
     fullName: "",
-    email: "",
+    emailemail: "",
     phoneNumber: "",
     consultationType: "",
     remark: "",

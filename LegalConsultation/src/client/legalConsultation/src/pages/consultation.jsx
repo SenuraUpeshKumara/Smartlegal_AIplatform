@@ -36,7 +36,7 @@ const Consultation = () => {
   const [formVisible, setFormVisible] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
-    emailemail: "",
+    email: "",
     phoneNumber: "",
     consultationType: "",
     remark: "",
