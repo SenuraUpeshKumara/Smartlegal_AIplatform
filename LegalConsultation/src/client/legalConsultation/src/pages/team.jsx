@@ -6,7 +6,7 @@ const teamMembers = [
   {
     name: "Adam Foster",
     role: "Consultant",
-    category: "Alllll",
+    category: "All",
     image: "/images/Adam-F.jpg",
     bio: "Expert in legal consulting with a strong background in corporate law and compliance.",
     description: "Adam provides strategic legal advice to clients, helping them navigate complex legal matters efficiently."

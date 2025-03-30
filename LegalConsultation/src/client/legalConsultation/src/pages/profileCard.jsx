@@ -18,7 +18,7 @@ const ProfileCard = ({ lawyer }) => {
     >
       <Avatar src={lawyer.image} alt={lawyer.name} sx={{ width: 100, height: 100, mb: 2 }} />
       <Typography variant="h5" fontWeight="bold">
-        {lawyer.namename}
+        {lawyer.name}
       </Typography>
       <Typography variant="subtitle1" color="textSecondary">
         {lawyer.position}
