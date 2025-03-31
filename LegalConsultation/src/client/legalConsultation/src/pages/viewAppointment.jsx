@@ -7,6 +7,7 @@ import {
   Card,
   Button,
   CircularProgress,
+  Divider,
 } from "@mui/material";
 
 const ViewAppointment = () => {
@@ -99,20 +100,21 @@ const ViewAppointment = () => {
     <Container maxWidth="sm">
       <Card sx={{ p: 4, borderRadius: 3, boxShadow: 3, textAlign: "center", mt: 5 }}>
         <Typography variant="h5" fontWeight="bold">Appointment Details</Typography>
+        <Divider sx={{ my: 2 }} />
         <Box sx={{ mt: 3, textAlign: "left" }}>
           <Typography variant="body1"><strong>Full Name:</strong> {appointment.fullName}</Typography>
           <Typography variant="body1"><strong>Email:</strong> {appointment.email}</Typography>
           <Typography variant="body1"><strong>Phone Number:</strong> {appointment.phoneNumber}</Typography>
           <Typography variant="body1"><strong>Consultation Type:</strong> {appointment.consultationType}</Typography>
           <Typography variant="body1"><strong>Date:</strong> {new Date(appointment.createdAt).toLocaleDateString()}</Typography>
-          <Typography variant="body1"><strong>Remark:</strong> {appointment.remark}</Typography>
+          <Typography variant="body1"><strong>Remark:</strong> {appointment.remark ? appointment.remark : "No remark"}</Typography>
         </Box>
 
         <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 4 }}>
-          <Button variant="contained" color="primary" onClick={handleReschedule}>
+          <Button variant="contained" color="primary" onClick={handleReschedule} sx={{ borderRadius: "20px" }}>
             Reschedule
           </Button>
-          <Button variant="contained" color="error" onClick={handleCancel}>
+          <Button variant="contained" color="error" onClick={handleCancel} sx={{ borderRadius: "20px" }}>
             Cancel
           </Button>
         </Box>
