@@ -113,6 +113,75 @@ const Consultation = () => {
   //   }
   // };
 
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [emailError, setEmailError] = useState("");
+  const [phoneError, setPhoneError] = useState("");
+  const [consultationError, setConsultationError] = useState("");
+
+  const handleEmailChange = (e) => {
+    const value = e.target.value;
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  
+    if (value === "") {
+      setEmailError(""); // No error while typing (until submission)
+    } else if (!emailPattern.test(value)) {
+      setEmailError("Invalid email address.");
+    } else {
+      setEmailError(""); // Clear error if valid
+    }
+  
+    handleChange(e);
+  };
+
+  const handlePhoneChange = (e) => {
+    const value = e.target.value;
+  
+    // Allow only numbers and limit to 10 digits
+    if (/^\d{0,10}$/.test(value)) {
+      handleChange(e);
+    }
+  
+    // Show error when input is invalid
+    if (value.length > 0 && value.length < 10) {
+      setPhoneError("Phone number must be exactly 10 digits.");
+    } else {
+      setPhoneError("");
+    }
+  };
+  
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    setIsSubmitted(true);
+  
+    let isValid = true; // Track if form is valid
+  
+    // Validate Phone Number
+    if (formData.phoneNumber.trim() === "") {
+      setPhoneError("Phone number is required.");
+      isValid = false;
+    } else if (formData.phoneNumber.length !== 10) {
+      setPhoneError("Phone number must be exactly 10 digits.");
+      isValid = false;
+    } else {
+      setPhoneError(""); // Clear error if valid
+    }
+  
+    // Validate Consultation Type
+    if (!formData.consultationType) {
+      setConsultationError("Please select a consultation type.");
+      isValid = false;
+    } else {
+      setConsultationError(""); // Clear error if valid
+    }
+  
+    // Proceed with form submission if all validations pass
+    if (isValid) {
+      console.log("Form submitted successfully!");
+      // Add your submission logic here
+    }
+  };
+  
+
   const handleConfirmAppointment = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -316,73 +385,108 @@ const Consultation = () => {
         
           {/* Form */}
           <form onSubmit={handleSubmit}>
-            <TextField 
-              fullWidth 
-              label="Full Name" 
-              name="fullName" 
-              value={formData.fullName} 
-              onChange={handleChange} 
-              margin="normal" 
-              required 
-              sx={{ bgcolor: "#fff", borderRadius: "8px" }} 
-            />
+          <TextField
+  fullWidth
+  label="Full Name"
+  name="fullName"
+  value={formData.fullName}
+  onChange={(e) => {
+    const value = e.target.value;
+    if (/^[A-Za-z\s]*$/.test(value) && value.length <= 50) {
+      handleChange(e);
+    }
+  }}
+  margin="normal"
+  required
+  sx={{ bgcolor: "#fff", borderRadius: "8px" }}
+  error={isSubmitted && (formData.fullName === "" || !/^[A-Za-z\s]+$/.test(formData.fullName))}
+  helperText={
+    isSubmitted && formData.fullName === ""
+      ? "Please fill this field."
+      : !/^[A-Za-z\s]+$/.test(formData.fullName)
+      ? "Only letters and spaces are allowed."
+      : ""
+  }
+/>
+
         
-            <TextField 
-              fullWidth 
-              label="Email Address" 
-              type="email" 
-              name="email" 
-              value={formData.email} 
-              onChange={handleChange} 
-              margin="normal" 
-              required 
-              sx={{ bgcolor: "#fff", borderRadius: "8px" }} 
-            />
+<TextField
+  fullWidth
+  label="Email Address"
+  type="email"
+  name="email"
+  value={formData.email}
+  onChange={handleEmailChange}
+  margin="normal"
+  required
+  sx={{ bgcolor: "#fff", borderRadius: "8px" }}
+  error={isSubmitted && formData.email === "" || emailError !== ""}
+  helperText={
+    isSubmitted && formData.email === ""
+      ? "Please fill this field."
+      : emailError
+  }
+/>
         
-            <TextField 
-              fullWidth 
-              label="Phone Number" 
-              type="tel" 
-              name="phoneNumber" 
-              value={formData.phoneNumber} 
-              onChange={handleChange} 
-              margin="normal" 
-              required 
-              sx={{ bgcolor: "#fff", borderRadius: "8px" }} 
-            />
+<TextField
+  fullWidth
+  label="Phone Number"
+  type="tel"
+  name="phoneNumber"
+  value={formData.phoneNumber}
+  onChange={handlePhoneChange}
+  margin="normal"
+  required
+  sx={{ bgcolor: "#fff", borderRadius: "8px" }}
+  error={isSubmitted && (phoneError !== "" || formData.phoneNumber.trim() === "")}
+  helperText={isSubmitted ? phoneError : ""}
+  
+/>
         
-            <TextField 
-              fullWidth 
-              select 
-              label="Consultation Type" 
-              name="consultationType" 
-              value={formData.consultationType} 
-              onChange={handleChange} 
-              margin="normal" 
-              required 
-              sx={{ bgcolor: "#fff", borderRadius: "8px" }}
-            >
-              {consultationTypes.map((option) => (
-                <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
-              ))}
-            </TextField>
+<TextField 
+  fullWidth 
+  select 
+  label="Consultation Type" 
+  name="consultationType" 
+  value={formData.consultationType} 
+  onChange={(e) => {
+    handleChange(e);
+    setConsultationError(""); // Clears error when a selection is made
+  }}
+  margin="normal" 
+  required 
+  sx={{ bgcolor: "#fff", borderRadius: "8px" }}
+  error={isSubmitted && !formData.consultationType}
+  helperText={isSubmitted && !formData.consultationType ? consultationError : ""} 
+>
+  {consultationTypes.map((option) => (
+    <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
+  ))}
+</TextField>
         
-            <TextField 
-              fullWidth 
-              label="Remark" 
-              name="remark" 
-              value={formData.remark} 
-              onChange={handleChange} 
-              margin="normal" 
-              multiline 
-              rows={3} 
-              sx={{ bgcolor: "#fff", borderRadius: "8px" }} 
-            />
+<TextField 
+  fullWidth 
+  label="Remark" 
+  name="remark" 
+  value={formData.remark} 
+  onChange={(e) => {
+    if (e.target.value.length <= 50) {
+      handleChange(e); // Update state only if within limit
+    }
+  }} 
+  margin="normal" 
+  multiline 
+  rows={3} 
+  sx={{ bgcolor: "#fff", borderRadius: "8px" }} 
+  error={formData.remark.length > 50}
+  helperText={formData.remark.length > 50 ? "Maximum 50 characters allowed." : ""}
+/>
         
             {/* Submit Button */}
             <Button
               type="submit"
               variant="contained"
+              onClick={() => setIsSubmitted(true)}
               sx={{
                 mt: 3,
                 backgroundColor: "#8C1C40",
