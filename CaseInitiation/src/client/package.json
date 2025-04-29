@@ -19,6 +19,7 @@
     "@mui/styles": "^6.4.8",
     "@tailwindcss/vite": "^4.0.15",
     "axios": "^1.8.4",
+    "client": "file:",
     "multer": "^1.4.5-lts.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
