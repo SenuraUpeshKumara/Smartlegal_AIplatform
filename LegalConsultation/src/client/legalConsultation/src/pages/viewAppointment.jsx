@@ -115,7 +115,7 @@ const ViewAppointment = () => {
             Reschedule
           </Button>
           <Button variant="contained" color="error" onClick={handleCancel} sx={{ borderRadius: "20px" }}>
-            Cancel Appointment
+            Cancel 
           </Button>
         </Box>
       </Card>
