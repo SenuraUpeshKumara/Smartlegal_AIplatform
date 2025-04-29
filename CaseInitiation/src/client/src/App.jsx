@@ -13,7 +13,7 @@ const App = () => {
     <div>
       <ToastContainer />
       <Routes>
-        <Route path='/' element={<RegisterLegalCase />} />
+        <Route path='/add-legal-case' element={<RegisterLegalCase />} />
         <Route path='/view-legal-case/:id' element={<ViewCaseDetails />} />
         <Route path="/update-case-details/:id" element={<UpdateLegalCase/>} />
         <Route path="/all-legal-cases" element={<AllLegalCases/>} />
