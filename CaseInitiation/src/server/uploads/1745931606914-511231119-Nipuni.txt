@@ -1,0 +1,22 @@
+Done :
+
+the list of all the lawyers
+search function
+lawyer's profile on client's view
+date selection page
+request a consultation form
+confirmation messages
+view appointment details
+
+
+Doing:
+
+sending the zoom link via an email
+reschedule the appointment
+
+
+To Do:
+
+generating pdf
+set reminders
+cancel appointment

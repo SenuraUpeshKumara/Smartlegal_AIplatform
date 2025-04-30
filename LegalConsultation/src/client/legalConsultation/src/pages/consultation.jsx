@@ -74,44 +74,6 @@ const Consultation = () => {
     setShowConfirmationModal(true); // Show the confirmation modal
   };
 
-  // const handleConfirmAppointment = async () => {
-  //   const submissionData = {
-  //     ...formData,
-  //     date: selectedDate.toLocaleDateString("en-US"),
-  //     timeSlot: selectedTimeSlot,
-  //   };
-
-  //   try {
-  //     const response = await fetch("http://localhost:8000/consultation/create", {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify(submissionData),
-  //     });
-
-  //     const data = await response.json();
-
-  //     if (response.ok) {
-  //       setShowSuccessDialog(true); // Show success dialog
-  //       setShowConfirmationModal(false); // Close the confirmation modal
-  //       setFormVisible(false); // Hide the form
-  //       setFormData({
-  //         fullName: "",
-  //         email: "",
-  //         phoneNumber: "",
-  //         consultationType: "",
-  //         remark: "",
-  //       });
-  //       // Redirect to the appointment page with the correct ID
-      
-  //     } else {
-  //       alert(`Error: ${data.message}`);
-
-  //     }
-  //   } catch (error) {
-  //     console.error("Error submitting form:", error);
-  //     alert("Something went wrong. Please try again.");
-  //   }
-  // };
 
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [emailError, setEmailError] = useState("");
@@ -252,6 +214,7 @@ const Consultation = () => {
 
   const handleCancelAppointment = () => {
     setShowConfirmationModal(false); // Close the modal
+    navigate("/");
   };
 
   const handleCloseSuccessDialog = () => {
